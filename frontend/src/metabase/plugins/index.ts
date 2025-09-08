@@ -59,6 +59,7 @@ import type {
   Bookmark,
   CacheableDashboard,
   CacheableModel,
+  CardId,
   CheckDependenciesResponse,
   Collection,
   CollectionAuthorityLevelConfig,
@@ -611,6 +612,10 @@ export const PLUGIN_EMBEDDING_IFRAME_SDK_SETUP = {
   ): ReactNode => null,
 };
 
+export const PLUGIN_ANONYMOUS_EMBEDDING = {
+  isFeatureEnabled: () => false,
+};
+
 export const PLUGIN_CONTENT_VERIFICATION = {
   contentVerificationEnabled: false,
   VerifiedFilter: {} as SearchFilterComponent<"verified">,
@@ -839,10 +844,10 @@ export const PLUGIN_DATABASE_REPLICATION = {
 
 export const PLUGIN_API = {
   getRemappedCardParameterValueUrl: (
-    dashboardId: DashboardId,
+    cardId: CardId,
     parameterId: ParameterId,
   ) =>
-    `/api/card/${dashboardId}/params/${encodeURIComponent(parameterId)}/remapping`,
+    `/api/card/${cardId}/params/${encodeURIComponent(parameterId)}/remapping`,
   getRemappedDashboardParameterValueUrl: (
     dashboardId: DashboardId,
     parameterId: ParameterId,
