@@ -22,8 +22,12 @@ import type { QuestionSharingModalType } from "./types";
 
 export function QuestionSharingMenu({ question }: { question: Question }) {
   const dispatch = useDispatch();
-  const { modalType, setModalType } =
-    useSharingModal<QuestionSharingModalType>();
+  const { modalType, setModalType } = useSharingModal<QuestionSharingModalType>(
+    {
+      resource: question.card(),
+      resourceType: "question",
+    },
+  );
   const hasPublicLink = !!question?.publicUUID?.();
   const isModel = question.type() === "model";
   const isArchived = question.isArchived();

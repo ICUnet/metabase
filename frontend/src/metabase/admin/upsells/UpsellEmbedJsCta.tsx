@@ -1,17 +1,13 @@
 import { t } from "ttag";
 
 import { useHasTokenFeature } from "metabase/common/hooks";
-import { useDispatch } from "metabase/lib/redux";
+import { useOpenEmbedJsWizard } from "metabase/embedding/hooks/use-open-embed-js-wizard";
 import { isEEBuild } from "metabase/lib/utils";
-import {
-  PLUGIN_ADMIN_SETTINGS,
-  type SdkIframeEmbedSetupModalProps,
-} from "metabase/plugins";
+import { PLUGIN_ADMIN_SETTINGS } from "metabase/plugins";
 import type {
   EmbedResource,
   EmbedResourceType,
 } from "metabase/public/lib/types";
-import { setOpenModalWithProps } from "metabase/redux/ui";
 import { Box } from "metabase/ui";
 
 import { UpsellCta } from "./components/UpsellCta";
@@ -27,7 +23,10 @@ export function useUpsellEmbedJsCta({
   resourceType: EmbedResourceType;
   closeModal: () => void;
 }) {
-  const dispatch = useDispatch();
+  const openEmbedJsWizard = useOpenEmbedJsWizard({
+    resource,
+    resourceType,
+  });
 
   const campaign = "embedded-analytics-js";
   const location = "static-embed-popover";
@@ -50,24 +49,7 @@ export function useUpsellEmbedJsCta({
   if (isEmbedJsEnabled) {
     return {
       openEmbedFlow: () => {
-        const modalProps: Pick<SdkIframeEmbedSetupModalProps, "initialState"> =
-          {
-            initialState: {
-              resourceType,
-              resourceId: resource.id,
-              isStatic: true,
-              useExistingUserSession: false,
-            },
-          };
-
-        closeModal();
-
-        dispatch(
-          setOpenModalWithProps({
-            id: "embed",
-            props: modalProps,
-          }),
-        );
+        openEmbedJsWizard({ onBeforeOpen: () => closeModal() });
       },
     };
   }

@@ -27,7 +27,10 @@ export function DashboardSharingMenu({ dashboard }: { dashboard: Dashboard }) {
     );
 
   const { modalType, setModalType } =
-    useSharingModal<DashboardSharingModalType>();
+    useSharingModal<DashboardSharingModalType>({
+      resource: dashboard,
+      resourceType: "dashboard",
+    });
 
   const hasPublicLink = !!dashboard?.public_uuid;
   const isArchived = dashboard.archived;

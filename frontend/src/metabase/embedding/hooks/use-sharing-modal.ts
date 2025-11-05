@@ -5,18 +5,35 @@ import type {
   QuestionSharingModalType,
 } from "metabase/embedding/components/SharingMenu/types";
 import { STATIC_LEGACY_EMBEDDING_TYPE } from "metabase/embedding/constants";
+import { useOpenEmbedJsWizard } from "metabase/embedding/hooks/use-open-embed-js-wizard";
 import { useDispatch, useSelector } from "metabase/lib/redux";
+import { isEEBuild } from "metabase/lib/utils";
+import type {
+  EmbedResource,
+  EmbedResourceType,
+} from "metabase/public/lib/types";
 import { setOpenModal } from "metabase/redux/ui";
 import { getCurrentOpenModal } from "metabase/selectors/ui";
 import type { ModalName } from "metabase-types/store/modal";
 
 export const useSharingModal = <
   TModalType extends DashboardSharingModalType | QuestionSharingModalType,
->() => {
+>({
+  resource,
+  resourceType,
+}: {
+  resource: EmbedResource;
+  resourceType: EmbedResourceType;
+}) => {
   const dispatch = useDispatch();
   const currentOpenModal = useSelector(getCurrentOpenModal);
 
   const [modalType, setModalType] = useState<TModalType | null>(null);
+
+  const openEmbedJsWizard = useOpenEmbedJsWizard({
+    resource,
+    resourceType,
+  });
 
   useEffect(() => {
     const allowedModalTypes: ModalName[] = [STATIC_LEGACY_EMBEDDING_TYPE];
@@ -35,9 +52,15 @@ export const useSharingModal = <
         dispatch(setOpenModal(null));
       }
 
-      setModalType(modalType);
+      if (isEEBuild()) {
+        // Force open EmbedJS wizard for EE/Pro
+        openEmbedJsWizard({ onBeforeOpen: () => setModalType(null) });
+      } else {
+        // Open Embed Type modal for oss
+        setModalType(modalType);
+      }
     },
-    [dispatch],
+    [dispatch, openEmbedJsWizard],
   );
 
   return { modalType, setModalType: handleSetModalType };
