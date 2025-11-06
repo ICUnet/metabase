@@ -6,6 +6,7 @@ import { FlexibleSizeComponent } from "embedding-sdk-bundle/components/private/F
 import { withPublicComponentWrapper } from "embedding-sdk-bundle/components/private/PublicComponentWrapper";
 import { SdkAdHocQuestion } from "embedding-sdk-bundle/components/private/SdkAdHocQuestion";
 import { SdkQuestionDefaultView } from "embedding-sdk-bundle/components/private/SdkQuestionDefaultView";
+import { withStaticNotAllowedGuard } from "embedding-sdk-bundle/components/private/StaticEmbeddingNotAllowedGuard";
 import { EnsureSingleInstance } from "embedding-sdk-shared/components/EnsureSingleInstance/EnsureSingleInstance";
 import { useLocale } from "metabase/common/hooks/use-locale";
 import { Stack } from "metabase/ui";
@@ -130,6 +131,6 @@ const MetabotQuestionWrapped = (props: MetabotQuestionProps) => {
 };
 
 export const MetabotQuestion = Object.assign(
-  withPublicComponentWrapper(MetabotQuestionWrapped),
+  withStaticNotAllowedGuard(withPublicComponentWrapper(MetabotQuestionWrapped)),
   { schema: metabotQuestionSchema },
 );
