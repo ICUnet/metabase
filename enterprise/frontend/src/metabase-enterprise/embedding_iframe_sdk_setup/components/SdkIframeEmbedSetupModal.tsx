@@ -1,3 +1,4 @@
+import cx from "classnames";
 import { useState } from "react";
 import { ResizableBox } from "react-resizable";
 import { match } from "ts-pattern";
@@ -8,6 +9,7 @@ import "react-resizable/css/styles.css";
 import noResultsSource from "assets/img/no_results.svg";
 import { useUpdateSettingsMutation } from "metabase/api";
 import { useSetting } from "metabase/common/hooks";
+import CS from "metabase/css/core/index.css";
 import { useDispatch } from "metabase/lib/redux";
 import type { SdkIframeEmbedSetupModalProps } from "metabase/plugins";
 import { closeModal } from "metabase/redux/ui";
@@ -22,6 +24,7 @@ import {
   Modal,
   Stack,
 } from "metabase/ui";
+import { EnableEmbeddedAnalyticsCard } from "metabase-enterprise/embedding_iframe_sdk_setup/components/EnableEmbeddedAnalyticsCard";
 import { SdkIframeStaticEmbeddingStatusBar } from "metabase-enterprise/embedding_iframe_sdk_setup/components/SdkIframeStaticEmbeddingStatusBar";
 import type { SettingKey } from "metabase-types/api";
 
@@ -38,13 +41,6 @@ export const SdkIframeEmbedSetupContent = () => {
   const { currentStep, settings } = useSdkIframeEmbedSetupContext();
 
   const isSimpleEmbeddingEnabled = useSetting("enable-embedding-simple");
-  const isStaticEmbeddingEnabled = useSetting("enable-embedding-static");
-
-  const isStaticEmbedding = !!settings.isStatic;
-
-  const isEmbeddingEnabled = isStaticEmbedding
-    ? isSimpleEmbeddingEnabled && isStaticEmbeddingEnabled
-    : isSimpleEmbeddingEnabled;
 
   const { handleNext, handleBack, canGoBack, StepContent } =
     useSdkIframeEmbedNavigation();
@@ -73,7 +69,7 @@ export const SdkIframeEmbedSetupContent = () => {
     .with("select-embed-options", () => (
       <Button
         variant="filled"
-        disabled={!isEmbeddingEnabled}
+        disabled={!isSimpleEmbeddingEnabled}
         onClick={handleNext}
       >
         {t`Get code`}
@@ -83,7 +79,7 @@ export const SdkIframeEmbedSetupContent = () => {
       <Button
         variant="filled"
         onClick={handleNext}
-        disabled={!isEmbeddingEnabled}
+        disabled={!isSimpleEmbeddingEnabled}
       >
         {t`Next`}
       </Button>
@@ -94,14 +90,26 @@ export const SdkIframeEmbedSetupContent = () => {
       <SidebarResizer>
         <Box className={S.Sidebar} component="aside">
           <Stack className={S.SidebarContent} gap="md">
-            <StepContent />
+            <Stack gap="md">
+              <EnableEmbeddedAnalyticsCard />
+
+              <Stack
+                gap="md"
+                opacity={isSimpleEmbeddingEnabled ? 1 : 0.5}
+                className={cx(
+                  !isSimpleEmbeddingEnabled && CS.pointerEventsNone,
+                )}
+              >
+                <StepContent />
+              </Stack>
+            </Stack>
           </Stack>
 
           <Group className={S.Navigation} justify="space-between">
             <Button
               variant="default"
               onClick={handleBack}
-              disabled={!canGoBack || !isEmbeddingEnabled}
+              disabled={!canGoBack || !isSimpleEmbeddingEnabled}
             >
               {t`Back`}
             </Button>
@@ -117,7 +125,7 @@ export const SdkIframeEmbedSetupContent = () => {
 
           <SdkIframeStaticEmbeddingStatusBar />
 
-          {isEmbeddingEnabled ? (
+          {isSimpleEmbeddingEnabled ? (
             <SdkIframeEmbedPreview />
           ) : (
             <Card h="100%">

@@ -1,10 +1,8 @@
-import cx from "classnames";
 import { type ReactNode, useCallback, useMemo } from "react";
 import { P, match } from "ts-pattern";
 import { t } from "ttag";
 
 import { useSetting } from "metabase/common/hooks";
-import CS from "metabase/css/core/index.css";
 import type { MetabaseColors } from "metabase/embedding-sdk/theme";
 import {
   Card,
@@ -17,7 +15,6 @@ import {
   Stack,
   Text,
 } from "metabase/ui";
-import { EnableEmbeddedAnalyticsCard } from "metabase-enterprise/embedding_iframe_sdk_setup/components/EnableEmbeddedAnalyticsCard";
 
 import { useSdkIframeEmbedSetupContext } from "../context";
 
@@ -26,27 +23,15 @@ import { LegacyStaticEmbeddingAlert } from "./LegacyStaticEmbeddingAlert";
 import { MetabotLayoutSetting } from "./MetabotLayoutSetting";
 import { ParameterSettings } from "./ParameterSettings";
 
-export const SelectEmbedOptionsStep = () => {
-  const isSimpleEmbeddingEnabled = useSetting("enable-embedding-simple");
-
-  return (
-    <Stack gap="md">
-      <EnableEmbeddedAnalyticsCard />
-
-      <Stack
-        gap="md"
-        opacity={isSimpleEmbeddingEnabled ? 1 : 0.5}
-        className={cx(!isSimpleEmbeddingEnabled && CS.pointerEventsNone)}
-      >
-        <AuthenticationSection />
-        <BehaviorSection />
-        <ParametersSection />
-        <AppearanceSection />
-        <LegacyStaticEmbeddingAlert />
-      </Stack>
-    </Stack>
-  );
-};
+export const SelectEmbedOptionsStep = () => (
+  <Stack gap="md">
+    <AuthenticationSection />
+    <BehaviorSection />
+    <ParametersSection />
+    <AppearanceSection />
+    <LegacyStaticEmbeddingAlert />
+  </Stack>
+);
 
 const AuthenticationSection = () => {
   const { experience, settings, updateSettings } =
