@@ -1,8 +1,10 @@
-import { useCallback, useMemo } from "react";
+import cx from "classnames";
+import { type ReactNode, useCallback, useMemo } from "react";
 import { P, match } from "ts-pattern";
 import { t } from "ttag";
 
 import { useSetting } from "metabase/common/hooks";
+import CS from "metabase/css/core/index.css";
 import type { MetabaseColors } from "metabase/embedding-sdk/theme";
 import {
   Card,
@@ -15,6 +17,7 @@ import {
   Stack,
   Text,
 } from "metabase/ui";
+import { EnableEmbeddedAnalyticsCard } from "metabase-enterprise/embedding_iframe_sdk_setup/components/EnableEmbeddedAnalyticsCard";
 
 import { useSdkIframeEmbedSetupContext } from "../context";
 
@@ -24,13 +27,23 @@ import { MetabotLayoutSetting } from "./MetabotLayoutSetting";
 import { ParameterSettings } from "./ParameterSettings";
 
 export const SelectEmbedOptionsStep = () => {
+  const isSimpleEmbeddingEnabled = useSetting("enable-embedding-simple");
+
   return (
     <Stack gap="md">
-      <AuthenticationSection />
-      <BehaviorSection />
-      <ParametersSection />
-      <AppearanceSection />
-      <LegacyStaticEmbeddingAlert />
+      <EnableEmbeddedAnalyticsCard />
+
+      <Stack
+        gap="md"
+        opacity={isSimpleEmbeddingEnabled ? 1 : 0.5}
+        className={cx(!isSimpleEmbeddingEnabled && CS.pointerEventsNone)}
+      >
+        <AuthenticationSection />
+        <BehaviorSection />
+        <ParametersSection />
+        <AppearanceSection />
+        <LegacyStaticEmbeddingAlert />
+      </Stack>
     </Stack>
   );
 };
@@ -98,6 +111,7 @@ const AuthenticationSection = () => {
                         size={14}
                         c="text-medium"
                         cursor="pointer"
+                        style={{ flexShrink: 0 }}
                       />
                     </HoverCard.Target>
                     <HoverCard.Dropdown>
@@ -139,6 +153,7 @@ const BehaviorSection = () => {
         (settings) => (
           <Checkbox
             label={t`Allow people to save new questions`}
+            disabled={settings.isStatic}
             checked={settings.isSaveEnabled}
             onChange={(e) =>
               updateSettings({ isSaveEnabled: e.target.checked })
@@ -150,11 +165,16 @@ const BehaviorSection = () => {
         { componentName: "metabase-question", questionId: P.nonNullable },
         (settings) => (
           <Stack gap="md">
-            <Checkbox
-              label={t`Allow people to drill through on data points`}
-              checked={settings.drills}
-              onChange={(e) => updateSettings({ drills: e.target.checked })}
-            />
+            <WithNotAvailableForStaticEmbeddingWarning>
+              {({ disabled }) => (
+                <Checkbox
+                  label={t`Allow people to drill through on data points`}
+                  disabled={disabled}
+                  checked={settings.drills}
+                  onChange={(e) => updateSettings({ drills: e.target.checked })}
+                />
+              )}
+            </WithNotAvailableForStaticEmbeddingWarning>
 
             <Checkbox
               label={t`Allow downloads`}
@@ -164,14 +184,18 @@ const BehaviorSection = () => {
               }
             />
 
-            <Checkbox
-              label={t`Allow people to save new questions`}
-              disabled={settings.isStatic}
-              checked={settings.isSaveEnabled}
-              onChange={(e) =>
-                updateSettings({ isSaveEnabled: e.target.checked })
-              }
-            />
+            <WithNotAvailableForStaticEmbeddingWarning>
+              {({ disabled }) => (
+                <Checkbox
+                  label={t`Allow people to save new questions`}
+                  disabled={disabled}
+                  checked={settings.isSaveEnabled}
+                  onChange={(e) =>
+                    updateSettings({ isSaveEnabled: e.target.checked })
+                  }
+                />
+              )}
+            </WithNotAvailableForStaticEmbeddingWarning>
           </Stack>
         ),
       )
@@ -179,12 +203,16 @@ const BehaviorSection = () => {
         { componentName: "metabase-dashboard", dashboardId: P.nonNullable },
         (settings) => (
           <Stack gap="md">
-            <Checkbox
-              label={t`Allow people to drill through on data points`}
-              disabled={settings.isStatic}
-              checked={settings.drills}
-              onChange={(e) => updateSettings({ drills: e.target.checked })}
-            />
+            <WithNotAvailableForStaticEmbeddingWarning>
+              {({ disabled }) => (
+                <Checkbox
+                  label={t`Allow people to drill through on data points`}
+                  disabled={disabled}
+                  checked={settings.drills}
+                  onChange={(e) => updateSettings({ drills: e.target.checked })}
+                />
+              )}
+            </WithNotAvailableForStaticEmbeddingWarning>
 
             <Checkbox
               label={t`Allow downloads`}
@@ -201,6 +229,7 @@ const BehaviorSection = () => {
         (settings) => (
           <Checkbox
             label={t`Allow editing dashboards and questions`}
+            disabled={settings.isStatic}
             checked={!settings.readOnly}
             onChange={(e) => updateSettings({ readOnly: !e.target.checked })}
           />
@@ -295,5 +324,40 @@ const AppearanceSection = () => {
       {appearanceSection && <Divider mt="lg" mb="md" />}
       {appearanceSection}
     </Card>
+  );
+};
+
+const WithNotAvailableForStaticEmbeddingWarning = ({
+  children,
+}: {
+  children: (data: { disabled: boolean }) => ReactNode;
+}) => {
+  const { settings } = useSdkIframeEmbedSetupContext();
+
+  const disabled = !!settings.isStatic;
+
+  return (
+    <Flex align="center" gap="xs">
+      {children({ disabled })}
+
+      {disabled && (
+        <HoverCard position="bottom">
+          <HoverCard.Target>
+            <Icon
+              name="info"
+              size={14}
+              c="text-medium"
+              cursor="pointer"
+              style={{ flexShrink: 0 }}
+            />
+          </HoverCard.Target>
+          <HoverCard.Dropdown>
+            <Text lh="md" p="md">
+              {t`Not available if unauthenticated is selected`}
+            </Text>
+          </HoverCard.Dropdown>
+        </HoverCard>
+      )}
+    </Flex>
   );
 };

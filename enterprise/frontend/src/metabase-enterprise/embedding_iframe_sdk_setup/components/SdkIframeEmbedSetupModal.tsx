@@ -71,7 +71,11 @@ export const SdkIframeEmbedSetupContent = () => {
       </Button>
     ))
     .with("select-embed-options", () => (
-      <Button variant="filled" onClick={handleNext}>
+      <Button
+        variant="filled"
+        disabled={!isEmbeddingEnabled}
+        onClick={handleNext}
+      >
         {t`Get code`}
       </Button>
     ))
