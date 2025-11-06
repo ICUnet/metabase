@@ -1,5 +1,5 @@
 import { sessionPropertiesPath } from "metabase/api";
-import { setOnBeforeRequestHandler } from "metabase/lib/api";
+import { PLUGIN_EMBEDDING_SDK } from "metabase/plugins";
 import { embedBase, internalBase } from "metabase/services";
 
 const COMMON_NO_AUTH_CHECK_ENDPOINTS = [sessionPropertiesPath];
@@ -144,9 +144,8 @@ function replaceWithEmbedBase(url: string): string {
  * into static embedding API requests.
  */
 export const overrideRequestsForStaticEmbedding = () => {
-  setOnBeforeRequestHandler({
-    key: "override-requests-for-static-embedding",
-    handler: async ({ method, url, options }) => {
+  PLUGIN_EMBEDDING_SDK.onBeforeRequestHandlers.overrideRequestsForStaticEmbedding =
+    async ({ method, url, options }) => {
       const transformation = getRequestTransformation({ method, url, options });
 
       if (!transformation) {
@@ -167,6 +166,5 @@ export const overrideRequestsForStaticEmbedding = () => {
         url: replaceWithEmbedBase(transformation.url),
         options: transformation.options,
       };
-    },
-  });
+    };
 };

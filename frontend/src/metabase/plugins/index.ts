@@ -580,10 +580,26 @@ export interface SimpleDataPickerProps {
   entityTypes: EmbeddingEntityType[];
 }
 
+export type OnBeforeRequestHandlerData = {
+  method: "GET" | "POST";
+  url: string;
+  options: {
+    headers?: Record<string, string>;
+    hasBody: boolean;
+  } & Record<string, unknown>;
+};
+
+export type OnBeforeRequestHandler = (
+  data: OnBeforeRequestHandlerData,
+) => Promise<void | OnBeforeRequestHandlerData>;
+
 export const PLUGIN_EMBEDDING_SDK = {
   isEnabled: () => false,
   onBeforeRequestHandlers: {
     getOrRefreshSessionHandler: async () => {},
+    overrideRequestsForStaticEmbedding: async (
+      _data: OnBeforeRequestHandlerData,
+    ): Promise<OnBeforeRequestHandlerData | void> => {},
   },
 };
 
