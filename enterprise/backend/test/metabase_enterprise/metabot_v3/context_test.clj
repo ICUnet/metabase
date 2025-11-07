@@ -208,3 +208,6 @@
                                              :source-database (mt/id)}}]}
           result (#'context/annotate-transform-source-types input)]
       (is (= :python (get-in result [:user_is_viewing 0 :source_type]))))))
+
+(deftest recent-views-in-context-test
+  (testing "Adds recent views to context"))
