@@ -1,3 +1,5 @@
+import { isEEBuild } from "metabase/lib/utils";
+
 import type {
   SdkIframeDashboardEmbedSettings,
   SdkIframeEmbedSetupExperience,
@@ -60,13 +62,19 @@ const GET_DISABLE_STATIC_EMBEDDING_SETTINGS: (data: {
 export const getCommonEmbedSettings = ({
   state,
   experience,
+  isStaticEmbeddingEnabled,
 }: {
   state:
     | Pick<SdkIframeEmbedSetupSettings, "isStatic" | "useExistingUserSession">
     | undefined;
   experience: SdkIframeEmbedSetupExperience;
+  isStaticEmbeddingEnabled: boolean;
 }) => {
-  return state?.isStatic
-    ? GET_ENABLE_STATIC_EMBEDDING_SETTINGS({ experience })
-    : GET_DISABLE_STATIC_EMBEDDING_SETTINGS({ state, experience });
+  if (isEEBuild()) {
+    return isStaticEmbeddingEnabled && state?.isStatic
+      ? GET_ENABLE_STATIC_EMBEDDING_SETTINGS({ experience })
+      : GET_DISABLE_STATIC_EMBEDDING_SETTINGS({ state, experience });
+  } else {
+    return GET_ENABLE_STATIC_EMBEDDING_SETTINGS({ experience });
+  }
 };

@@ -10,10 +10,12 @@ export const getAdjustedSdkIframeEmbedSetting = ({
   defaultSettings,
   prevSettings,
   settings,
+  isStaticEmbeddingEnabled,
 }: {
   defaultSettings: SdkIframeEmbedSetupSettings;
   prevSettings: SdkIframeEmbedSetupSettings;
   settings: SdkIframeEmbedSetupSettings;
+  isStaticEmbeddingEnabled: boolean;
 }): SdkIframeEmbedSetupSettings => {
   const experience = getExperienceFromSettings(settings);
 
@@ -31,6 +33,7 @@ export const getAdjustedSdkIframeEmbedSetting = ({
             useExistingUserSession: settings.useExistingUserSession,
           },
           experience,
+          isStaticEmbeddingEnabled,
         }),
       }),
     )
@@ -50,6 +53,7 @@ export const getAdjustedSdkIframeEmbedSetting = ({
             useExistingUserSession: settings.useExistingUserSession,
           },
           experience,
+          isStaticEmbeddingEnabled,
         }),
         useExistingUserSession: settings.useExistingUserSession,
       }),

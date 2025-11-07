@@ -80,7 +80,15 @@ const AuthenticationSection = () => {
         <Radio.Group value={authType} onChange={handleAuthTypeChange}>
           <Stack gap="sm">
             {isQuestionOrDashboardEmbed && (
-              <Radio value="no-user" label={t`Unauthenticated`} />
+              <WithStaticIsDisabledWarning>
+                {({ disabled }) => (
+                  <Radio
+                    disabled={disabled}
+                    value="no-user"
+                    label={t`Unauthenticated`}
+                  />
+                )}
+              </WithStaticIsDisabledWarning>
             )}
 
             <Radio
@@ -312,6 +320,25 @@ const AppearanceSection = () => {
   );
 };
 
+const WithStaticIsDisabledWarning = ({
+  children,
+}: {
+  children: (data: { disabled: boolean }) => ReactNode;
+}) => {
+  const { isStaticEmbeddingEnabled } = useSdkIframeEmbedSetupContext();
+
+  const disabled = !isStaticEmbeddingEnabled;
+
+  return (
+    <TooltipWarning
+      warning={t`Disabled in the admin settings`}
+      disabled={disabled}
+    >
+      {children}
+    </TooltipWarning>
+  );
+};
+
 const WithNotAvailableForStaticEmbeddingWarning = ({
   children,
 }: {
@@ -321,6 +348,25 @@ const WithNotAvailableForStaticEmbeddingWarning = ({
 
   const disabled = !!settings.isStatic;
 
+  return (
+    <TooltipWarning
+      warning={t`Not available if unauthenticated is selected`}
+      disabled={disabled}
+    >
+      {children}
+    </TooltipWarning>
+  );
+};
+
+const TooltipWarning = ({
+  children,
+  warning,
+  disabled,
+}: {
+  children: (data: { disabled: boolean }) => ReactNode;
+  warning: string;
+  disabled: boolean;
+}) => {
   return (
     <Flex align="center" gap="xs">
       {children({ disabled })}
@@ -338,7 +384,7 @@ const WithNotAvailableForStaticEmbeddingWarning = ({
           </HoverCard.Target>
           <HoverCard.Dropdown>
             <Text lh="md" p="md">
-              {t`Not available if unauthenticated is selected`}
+              {warning}
             </Text>
           </HoverCard.Dropdown>
         </HoverCard>

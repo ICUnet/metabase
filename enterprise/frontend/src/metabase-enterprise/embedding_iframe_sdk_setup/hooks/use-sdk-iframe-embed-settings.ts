@@ -53,11 +53,13 @@ export const useSdkIframeEmbedSettings = ({
   recentDashboards,
   isRecentsLoading,
   modelCount,
+  isStaticEmbeddingEnabled,
 }: {
   initialState: SdkIframeEmbedSetupModalInitialState | undefined;
   recentDashboards: SdkIframeEmbedSetupRecentItem[];
   isRecentsLoading: boolean;
   modelCount: number;
+  isStaticEmbeddingEnabled: boolean;
 }) => {
   const [isEmbedSettingsLoaded, setEmbedSettingsLoaded] = useState(false);
   const [persistedSettings, persistSettings] = usePersistedSettings();
@@ -71,6 +73,7 @@ export const useSdkIframeEmbedSettings = ({
             initialState,
             experience: "dashboard",
             resourceId: initialState.resourceId,
+            isStaticEmbeddingEnabled,
           }),
       )
       .with(
@@ -80,6 +83,7 @@ export const useSdkIframeEmbedSettings = ({
             initialState,
             experience: "chart",
             resourceId: initialState.resourceId,
+            isStaticEmbeddingEnabled,
           }),
       )
       .otherwise((initialState) =>
@@ -87,9 +91,10 @@ export const useSdkIframeEmbedSettings = ({
           initialState,
           experience: "dashboard",
           resourceId: recentDashboards[0]?.id ?? EMBED_FALLBACK_DASHBOARD_ID,
+          isStaticEmbeddingEnabled,
         }),
       );
-  }, [recentDashboards, initialState]);
+  }, [recentDashboards, initialState, isStaticEmbeddingEnabled]);
 
   const [rawSettings, setRawSettings] = useState<SdkIframeEmbedSetupSettings>();
 
@@ -126,13 +131,14 @@ export const useSdkIframeEmbedSettings = ({
           defaultSettings: defaultSettings,
           prevSettings: prevSettings ?? defaultSettings,
           settings: mergedSettings,
+          isStaticEmbeddingEnabled,
         });
 
         persistSettings(adjustedSettings);
 
         return adjustedSettings;
       }),
-    [defaultSettings, persistSettings],
+    [defaultSettings, persistSettings, isStaticEmbeddingEnabled],
   );
 
   const replaceSettings = useCallback(
@@ -163,6 +169,7 @@ export const useSdkIframeEmbedSettings = ({
           defaultSettings,
           prevSettings: prevSettings ?? defaultSettings,
           settings: mergedSettings,
+          isStaticEmbeddingEnabled,
         });
 
         return adjustedSettings;
@@ -179,6 +186,7 @@ export const useSdkIframeEmbedSettings = ({
     isRecentsLoading,
     initialState,
     defaultSettings,
+    isStaticEmbeddingEnabled,
   ]);
 
   return {

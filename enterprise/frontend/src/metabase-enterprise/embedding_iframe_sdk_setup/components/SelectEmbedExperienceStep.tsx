@@ -17,6 +17,7 @@ import { getDefaultSdkIframeEmbedSettings } from "../utils/get-default-sdk-ifram
 
 export const SelectEmbedExperienceStep = () => {
   const {
+    isStaticEmbeddingEnabled,
     initialState,
     experience,
     settings,
@@ -55,6 +56,7 @@ export const SelectEmbedExperienceStep = () => {
         initialState,
         experience,
         resourceId: defaultResourceId,
+        isStaticEmbeddingEnabled,
       }),
     });
   };

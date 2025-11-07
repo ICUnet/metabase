@@ -16,6 +16,13 @@ import type {
 } from "./types";
 
 export interface SdkIframeEmbedSetupContextType {
+  // Edition
+  isEE: boolean;
+
+  // User settings
+  isSimpleEmbeddingEnabled: boolean;
+  isStaticEmbeddingEnabled: boolean;
+
   // Navigation
   currentStep: SdkIframeEmbedSetupStep;
   setCurrentStep: (step: SdkIframeEmbedSetupStep) => void;

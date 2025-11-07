@@ -1,6 +1,8 @@
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 
 import { useSearchQuery } from "metabase/api";
+import { useSetting } from "metabase/common/hooks";
+import { isEEBuild } from "metabase/lib/utils";
 import type { SdkIframeEmbedSetupModalInitialState } from "metabase/plugins";
 import { useEmbeddingParameters } from "metabase-enterprise/embedding_iframe_sdk_setup/hooks/use-embedding-paramers";
 import { useGetStaticEmbeddingSignedToken } from "metabase-enterprise/embedding_iframe_sdk_setup/hooks/use-get-static-embedding-signed-token";
@@ -30,6 +32,11 @@ export const SdkIframeEmbedSetupProvider = ({
   initialState,
   onClose,
 }: SdkIframeEmbedSetupProviderProps) => {
+  const isEE = isEEBuild();
+
+  const isSimpleEmbeddingEnabled = useSetting("enable-embedding-simple");
+  const isStaticEmbeddingEnabled = useSetting("enable-embedding-static");
+
   // We don't want to re-fetch the recent items every time we switch between
   // steps, therefore we load recent items once in the provider.
   const {
@@ -71,6 +78,7 @@ export const SdkIframeEmbedSetupProvider = ({
     recentDashboards,
     isRecentsLoading,
     modelCount,
+    isStaticEmbeddingEnabled,
   });
 
   // Which embed experience are we setting up?
@@ -129,6 +137,9 @@ export const SdkIframeEmbedSetupProvider = ({
   ]);
 
   const value: SdkIframeEmbedSetupContextType = {
+    isEE,
+    isSimpleEmbeddingEnabled,
+    isStaticEmbeddingEnabled,
     currentStep,
     setCurrentStep,
     initialState,

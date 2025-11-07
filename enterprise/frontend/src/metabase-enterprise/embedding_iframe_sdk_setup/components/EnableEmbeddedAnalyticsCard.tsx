@@ -2,7 +2,7 @@ import { useState } from "react";
 import { t } from "ttag";
 
 import { useUpdateSettingsMutation } from "metabase/api";
-import { useSetting, useToast } from "metabase/common/hooks";
+import { useToast } from "metabase/common/hooks";
 import {
   Box,
   Button,
@@ -13,9 +13,10 @@ import {
   Stack,
   Text,
 } from "metabase/ui";
+import { useSdkIframeEmbedSetupContext } from "metabase-enterprise/embedding_iframe_sdk_setup/context";
 
 export const EnableEmbeddedAnalyticsCard = () => {
-  const isSimpleEmbeddingEnabled = useSetting("enable-embedding-simple");
+  const { isSimpleEmbeddingEnabled } = useSdkIframeEmbedSetupContext();
   const [updateSettings] = useUpdateSettingsMutation();
   const [sendToast] = useToast();
 

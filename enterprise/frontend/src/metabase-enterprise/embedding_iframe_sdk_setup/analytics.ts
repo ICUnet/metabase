@@ -72,16 +72,19 @@ export const trackEmbedWizardOptionsCompleted = ({
   initialState,
   settings,
   experience,
+  isStaticEmbeddingEnabled,
 }: {
   initialState: SdkIframeEmbedSetupModalInitialState | undefined;
   settings: Partial<SdkIframeEmbedSettings>;
   experience: SdkIframeEmbedSetupExperience;
+  isStaticEmbeddingEnabled: boolean;
 }) => {
   // Get defaults for this experience type (with a dummy resource ID)
   const defaultSettings = getDefaultSdkIframeEmbedSettings({
     initialState,
     experience,
     resourceId: 0,
+    isStaticEmbeddingEnabled,
   });
 
   // Does the embed settings diverge from the experience defaults?
