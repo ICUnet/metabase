@@ -4,10 +4,12 @@ import type {
   DashboardSharingModalType,
   QuestionSharingModalType,
 } from "metabase/embedding/components/SharingMenu/types";
-import { STATIC_LEGACY_EMBEDDING_TYPE } from "metabase/embedding/constants";
+import {
+  STATIC_EMBED_JS_EMBEDDING_TYPE,
+  STATIC_LEGACY_EMBEDDING_TYPE,
+} from "metabase/embedding/constants";
 import { useOpenEmbedJsWizard } from "metabase/embedding/hooks/use-open-embed-js-wizard";
 import { useDispatch, useSelector } from "metabase/lib/redux";
-import { isEEBuild } from "metabase/lib/utils";
 import type {
   EmbedResource,
   EmbedResourceType,
@@ -52,12 +54,13 @@ export const useSharingModal = <
         dispatch(setOpenModal(null));
       }
 
-      if (isEEBuild()) {
-        // Force open EmbedJS wizard for EE/Pro
-        openEmbedJsWizard({ onBeforeOpen: () => setModalType(null) });
-      } else {
-        // Open Embed Type modal for oss
-        setModalType(modalType);
+      switch (modalType) {
+        case STATIC_EMBED_JS_EMBEDDING_TYPE:
+          openEmbedJsWizard({ onBeforeOpen: () => setModalType(null) });
+          break;
+
+        default:
+          setModalType(modalType);
       }
     },
     [dispatch, openEmbedJsWizard],

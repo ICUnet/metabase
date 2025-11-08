@@ -16,24 +16,16 @@ jest.mock("../PublicLinkPopover", () => ({
 }));
 
 jest.mock("metabase/query_builder/components/QuestionEmbedWidget", () => ({
-  QuestionEmbedWidget: jest.fn(({ initialEmbedType }) => (
-    <div
-      data-testid="question-embed-widget"
-      data-initial-embed-type={initialEmbedType ?? "none"}
-    />
+  QuestionEmbedWidget: jest.fn(() => (
+    <div data-testid="question-embed-widget" />
   )),
 }));
 
 jest.mock(
   "metabase/dashboard/containers/DashboardSharingEmbeddingModal",
   () => ({
-    DashboardSharingEmbeddingModal: jest.fn(({ isOpen, initialEmbedType }) =>
-      isOpen ? (
-        <div
-          data-testid="dashboard-sharing-embedding-modal"
-          data-initial-embed-type={initialEmbedType ?? "none"}
-        />
-      ) : null,
+    DashboardSharingEmbeddingModal: jest.fn(({ isOpen }) =>
+      isOpen ? <div data-testid="dashboard-sharing-embedding-modal" /> : null,
     ),
   }),
 );
@@ -96,21 +88,7 @@ describe("SharingModals", () => {
       ).toBeInTheDocument();
     });
 
-    it("should render QuestionEmbedWidget for question-embed", () => {
-      render(
-        <SharingModals
-          modalType="question-embed"
-          question={mockQuestion}
-          onClose={mockOnClose}
-        />,
-      );
-
-      const widget = screen.getByTestId("question-embed-widget");
-      expect(widget).toBeInTheDocument();
-      expect(widget).toHaveAttribute("data-initial-embed-type", "none");
-    });
-
-    it("should render QuestionEmbedWidget with initialEmbedType for static-legacy", () => {
+    it("should render QuestionEmbedWidget for static-legacy", () => {
       render(
         <SharingModals
           modalType={STATIC_LEGACY_EMBEDDING_TYPE}
@@ -121,7 +99,6 @@ describe("SharingModals", () => {
 
       const widget = screen.getByTestId("question-embed-widget");
       expect(widget).toBeInTheDocument();
-      expect(widget).toHaveAttribute("data-initial-embed-type", "application");
     });
   });
 
@@ -140,21 +117,7 @@ describe("SharingModals", () => {
       ).toBeInTheDocument();
     });
 
-    it("should render DashboardSharingEmbeddingModal for dashboard-embed", () => {
-      render(
-        <SharingModals
-          modalType="dashboard-embed"
-          dashboard={mockDashboard}
-          onClose={mockOnClose}
-        />,
-      );
-
-      const modal = screen.getByTestId("dashboard-sharing-embedding-modal");
-      expect(modal).toBeInTheDocument();
-      expect(modal).toHaveAttribute("data-initial-embed-type", "none");
-    });
-
-    it("should render DashboardSharingEmbeddingModal with initialEmbedType for static-legacy", () => {
+    it("should render DashboardSharingEmbeddingModal for static-legacy", () => {
       render(
         <SharingModals
           modalType={STATIC_LEGACY_EMBEDDING_TYPE}
@@ -165,48 +128,11 @@ describe("SharingModals", () => {
 
       const modal = screen.getByTestId("dashboard-sharing-embedding-modal");
       expect(modal).toBeInTheDocument();
-      expect(modal).toHaveAttribute("data-initial-embed-type", "application");
     });
   });
 
   describe("edge cases", () => {
-    it("should prioritize question modal when both question and dashboard are provided with question modalType", () => {
-      render(
-        // @ts-expect-error Testing invalid state
-        <SharingModals
-          modalType="question-embed"
-          question={mockQuestion}
-          dashboard={mockDashboard}
-          onClose={mockOnClose}
-        />,
-      );
-
-      expect(screen.getByTestId("question-embed-widget")).toBeInTheDocument();
-      expect(
-        screen.queryByTestId("dashboard-sharing-embedding-modal"),
-      ).not.toBeInTheDocument();
-    });
-
-    it("should prioritize dashboard modal when both question and dashboard are provided with dashboard modalType", () => {
-      render(
-        // @ts-expect-error Testing invalid state
-        <SharingModals
-          modalType="dashboard-embed"
-          question={mockQuestion}
-          dashboard={mockDashboard}
-          onClose={mockOnClose}
-        />,
-      );
-
-      expect(
-        screen.getByTestId("dashboard-sharing-embedding-modal"),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByTestId("question-embed-widget"),
-      ).not.toBeInTheDocument();
-    });
-
-    it("should render question modal for static-legacy when both question and dashboard are provided", () => {
+    it("should prioritize question modal when both question and dashboard are provided", () => {
       render(
         // @ts-expect-error Testing invalid state
         <SharingModals

@@ -44,10 +44,8 @@ export interface StaticEmbedSetupPaneProps {
   resourceType: StaticEmbedResourceType;
   resourceParameters: EmbedResourceParameter[];
 
-  onUpdateEnableEmbedding: (enableEmbedding: boolean) => void | Promise<void>;
-  onUpdateEmbeddingParams: (
-    embeddingParams: EmbeddingParameters,
-  ) => void | Promise<void>;
+  onUpdateEnableEmbedding: (enableEmbedding: boolean) => void;
+  onUpdateEmbeddingParams: (embeddingParams: EmbeddingParameters) => void;
 }
 
 export const StaticEmbedSetupPane = ({

@@ -64,18 +64,8 @@ export const SharingModals = ({
     );
   }
 
-  if (modalType === "question-embed" && question) {
-    return <QuestionEmbedWidget card={question._card} onClose={onClose} />;
-  }
-
   if (modalType === STATIC_LEGACY_EMBEDDING_TYPE && question) {
-    return (
-      <QuestionEmbedWidget
-        card={question._card}
-        initialEmbedType="application"
-        onClose={onClose}
-      />
-    );
+    return <QuestionEmbedWidget card={question._card} onClose={onClose} />;
   }
 
   if (modalType === "dashboard-public-link") {
@@ -89,23 +79,11 @@ export const SharingModals = ({
     );
   }
 
-  if (modalType === "dashboard-embed" && dashboard) {
-    return (
-      <DashboardSharingEmbeddingModal
-        key="dashboard-embed"
-        dashboard={dashboard}
-        onClose={onClose}
-        isOpen
-      />
-    );
-  }
-
   if (modalType === STATIC_LEGACY_EMBEDDING_TYPE && dashboard) {
     return (
       <DashboardSharingEmbeddingModal
         key="dashboard-embed"
         dashboard={dashboard}
-        initialEmbedType="application"
         onClose={onClose}
         isOpen
       />

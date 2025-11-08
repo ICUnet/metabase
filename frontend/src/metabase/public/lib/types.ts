@@ -7,8 +7,6 @@ import type {
 
 export type DisplayTheme = "light" | "night" | "transparent";
 
-export type EmbedModalStep = "application" | "legalese" | null;
-
 export type EmbedResource = (Card | Dashboard) & {
   embedding_params?: EmbeddingParameters | null;
 };

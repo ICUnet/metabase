@@ -2,6 +2,7 @@ import { t } from "ttag";
 
 import { isInstanceAnalyticsCollection } from "metabase/collections/utils";
 import { useSetting } from "metabase/common/hooks";
+import { STATIC_EMBED_JS_EMBEDDING_TYPE } from "metabase/embedding/constants";
 import { useDispatch, useSelector } from "metabase/lib/redux";
 import { setUIControls } from "metabase/query_builder/actions";
 import { MODAL_TYPES } from "metabase/query_builder/constants";
@@ -92,7 +93,9 @@ export function QuestionSharingMenu({ question }: { question: Question }) {
           hasPublicLink={hasPublicLink}
           onClick={() => setModalType("question-public-link")}
         />
-        <EmbedMenuItem onClick={() => setModalType("question-embed")} />
+        <EmbedMenuItem
+          onClick={() => setModalType(STATIC_EMBED_JS_EMBEDDING_TYPE)}
+        />
       </SharingMenu>
       <SharingModals
         modalType={modalType}
