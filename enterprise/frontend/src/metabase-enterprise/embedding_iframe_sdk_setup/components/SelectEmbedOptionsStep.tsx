@@ -11,6 +11,7 @@ import {
   Flex,
   HoverCard,
   Icon,
+  type IconName,
   Radio,
   Stack,
   Text,
@@ -34,7 +35,7 @@ export const SelectEmbedOptionsStep = () => (
 );
 
 const AuthenticationSection = () => {
-  const { experience, settings, updateSettings } =
+  const { isEE, experience, settings, updateSettings } =
     useSdkIframeEmbedSetupContext();
 
   const isStaticEmbedding = !!settings.isStatic;
@@ -66,6 +67,9 @@ const AuthenticationSection = () => {
     });
   };
 
+  /* eslint-disable-next-line no-literal-metabase-strings -- this string is only shown for admins. */
+  const existingMetabaseSessionLabel = t`Existing Metabase session`;
+
   return (
     <Card p="md">
       <Stack gap="md" p="xs">
@@ -91,38 +95,50 @@ const AuthenticationSection = () => {
               </WithStaticIsDisabledWarning>
             )}
 
-            <Radio
-              value="user-session"
-              label={
-                <Flex align="center" gap="xs">
-                  {/* eslint-disable-next-line no-literal-metabase-strings -- this string is only shown for admins. */}
-                  <Text>{t`Existing Metabase session`}</Text>
-                  <HoverCard position="bottom">
-                    <HoverCard.Target>
-                      <Icon
-                        name="info"
-                        size={14}
-                        c="text-medium"
-                        cursor="pointer"
-                        style={{ flexShrink: 0 }}
-                      />
-                    </HoverCard.Target>
-                    <HoverCard.Dropdown>
-                      <Text lh="md" p="md" style={{ width: 300 }}>
-                        {/* eslint-disable-next-line no-literal-metabase-strings -- this string is only shown for admins. */}
-                        {t`This option lets you test Embedded Analytics JS locally using your existing Metabase session cookie. This only works for testing locally, using your admin account and on this browser. This may not work on Safari and Firefox. We recommend testing this in Chrome.`}
-                      </Text>
-                    </HoverCard.Dropdown>
-                  </HoverCard>
-                </Flex>
-              }
-            />
+            <WithNotAvailableForOSS shouldWrap={!isEE}>
+              {({ disabled }) => (
+                <Radio
+                  value="user-session"
+                  label={
+                    disabled ? (
+                      existingMetabaseSessionLabel
+                    ) : (
+                      <Flex align="center" gap="xs">
+                        <Text>{existingMetabaseSessionLabel}</Text>
+                        <HoverCard position="bottom">
+                          <HoverCard.Target>
+                            <Icon
+                              name="info"
+                              size={14}
+                              c="text-medium"
+                              cursor="pointer"
+                              style={{ flexShrink: 0 }}
+                            />
+                          </HoverCard.Target>
+                          <HoverCard.Dropdown>
+                            <Text lh="md" p="md" style={{ width: 300 }}>
+                              {/* eslint-disable-next-line no-literal-metabase-strings -- this string is only shown for admins. */}
+                              {t`This option lets you test Embedded Analytics JS locally using your existing Metabase session cookie. This only works for testing locally, using your admin account and on this browser. This may not work on Safari and Firefox. We recommend testing this in Chrome.`}
+                            </Text>
+                          </HoverCard.Dropdown>
+                        </HoverCard>
+                      </Flex>
+                    )
+                  }
+                  disabled={disabled}
+                />
+              )}
+            </WithNotAvailableForOSS>
 
-            <Radio
-              value="sso"
-              label={t`Single sign-on (SSO)`}
-              disabled={!isSsoEnabledAndConfigured}
-            />
+            <WithNotAvailableForOSS shouldWrap={!isEE}>
+              {({ disabled }) => (
+                <Radio
+                  value="sso"
+                  label={t`Single sign-on (SSO)`}
+                  disabled={disabled || !isSsoEnabledAndConfigured}
+                />
+              )}
+            </WithNotAvailableForOSS>
           </Stack>
         </Radio.Group>
 
@@ -339,6 +355,29 @@ const WithStaticIsDisabledWarning = ({
   );
 };
 
+const WithNotAvailableForOSS = ({
+  children,
+  shouldWrap,
+}: {
+  children: (data: { disabled: boolean }) => ReactNode;
+  shouldWrap: boolean;
+}) => {
+  const { settings } = useSdkIframeEmbedSetupContext();
+
+  const disabled = !!settings.isStatic;
+
+  return (
+    <TooltipWarning
+      shouldWrap={shouldWrap}
+      icon="gem"
+      warning={"TODO"}
+      disabled={disabled}
+    >
+      {children}
+    </TooltipWarning>
+  );
+};
+
 const WithNotAvailableForStaticEmbeddingWarning = ({
   children,
 }: {
@@ -360,13 +399,21 @@ const WithNotAvailableForStaticEmbeddingWarning = ({
 
 const TooltipWarning = ({
   children,
+  shouldWrap = true,
+  icon,
   warning,
   disabled,
 }: {
   children: (data: { disabled: boolean }) => ReactNode;
+  shouldWrap?: boolean;
+  icon?: IconName;
   warning: string;
   disabled: boolean;
 }) => {
+  if (!shouldWrap) {
+    return children({ disabled });
+  }
+
   return (
     <Flex align="center" gap="xs">
       {children({ disabled })}
@@ -375,7 +422,7 @@ const TooltipWarning = ({
         <HoverCard position="bottom">
           <HoverCard.Target>
             <Icon
-              name="info"
+              name={icon ?? "info"}
               size={14}
               c="text-medium"
               cursor="pointer"
