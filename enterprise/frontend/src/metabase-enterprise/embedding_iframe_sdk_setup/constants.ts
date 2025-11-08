@@ -13,8 +13,10 @@ import type {
 export const EMBED_RESOURCE_LIST_MAX_RECENTS = 6;
 
 export const getEmbedExperiences = ({
+  isEE,
   isMetabotAvailable,
 }: {
+  isEE: boolean;
   isMetabotAvailable: boolean;
 }) =>
   [
@@ -32,11 +34,13 @@ export const getEmbedExperiences = ({
       value: "exploration",
       title: t`Exploration`,
       description: t`Embed an interactive data exploration experience`,
+      showUpsell: !isEE,
     },
     {
       value: "browser",
       title: t`Browser`,
       description: t`Embed a browser to manage dashboards and charts`,
+      showUpsell: !isEE,
     },
     ...(isMetabotAvailable
       ? [
@@ -44,6 +48,7 @@ export const getEmbedExperiences = ({
             value: "metabot" as const,
             title: t`Metabot`,
             description: t`Embed a Metabot chat interface`,
+            showUpsell: !isEE,
           },
         ]
       : []),
@@ -51,6 +56,7 @@ export const getEmbedExperiences = ({
     title: string;
     description: string;
     value: SdkIframeEmbedSetupExperience;
+    showUpsell?: boolean;
   }[];
 
 type EmbedStepConfig = {

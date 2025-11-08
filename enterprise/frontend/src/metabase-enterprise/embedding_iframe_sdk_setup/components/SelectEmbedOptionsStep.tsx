@@ -11,7 +11,6 @@ import {
   Flex,
   HoverCard,
   Icon,
-  type IconName,
   Radio,
   Stack,
   Text,
@@ -23,6 +22,8 @@ import { ColorCustomizationSection } from "./ColorCustomizationSection";
 import { LegacyStaticEmbeddingAlert } from "./LegacyStaticEmbeddingAlert";
 import { MetabotLayoutSetting } from "./MetabotLayoutSetting";
 import { ParameterSettings } from "./ParameterSettings";
+import { TooltipWarning } from "./warnings/TooltipWarning";
+import { WithNotAvailableForOssUpsellTooltip } from "./warnings/WithNotAvailableForOssUpsellTooltip";
 
 export const SelectEmbedOptionsStep = () => (
   <Stack gap="md">
@@ -95,7 +96,7 @@ const AuthenticationSection = () => {
               </WithStaticIsDisabledWarning>
             )}
 
-            <WithNotAvailableForOSS shouldWrap={!isEE}>
+            <WithNotAvailableForOssUpsellTooltip shouldWrap={!isEE}>
               {({ disabled }) => (
                 <Radio
                   value="user-session"
@@ -128,9 +129,9 @@ const AuthenticationSection = () => {
                   disabled={disabled}
                 />
               )}
-            </WithNotAvailableForOSS>
+            </WithNotAvailableForOssUpsellTooltip>
 
-            <WithNotAvailableForOSS shouldWrap={!isEE}>
+            <WithNotAvailableForOssUpsellTooltip shouldWrap={!isEE}>
               {({ disabled }) => (
                 <Radio
                   value="sso"
@@ -138,7 +139,7 @@ const AuthenticationSection = () => {
                   disabled={disabled || !isSsoEnabledAndConfigured}
                 />
               )}
-            </WithNotAvailableForOSS>
+            </WithNotAvailableForOssUpsellTooltip>
           </Stack>
         </Radio.Group>
 
@@ -355,29 +356,6 @@ const WithStaticIsDisabledWarning = ({
   );
 };
 
-const WithNotAvailableForOSS = ({
-  children,
-  shouldWrap,
-}: {
-  children: (data: { disabled: boolean }) => ReactNode;
-  shouldWrap: boolean;
-}) => {
-  const { settings } = useSdkIframeEmbedSetupContext();
-
-  const disabled = !!settings.isStatic;
-
-  return (
-    <TooltipWarning
-      shouldWrap={shouldWrap}
-      icon="gem"
-      warning={"TODO"}
-      disabled={disabled}
-    >
-      {children}
-    </TooltipWarning>
-  );
-};
-
 const WithNotAvailableForStaticEmbeddingWarning = ({
   children,
 }: {
@@ -394,48 +372,5 @@ const WithNotAvailableForStaticEmbeddingWarning = ({
     >
       {children}
     </TooltipWarning>
-  );
-};
-
-const TooltipWarning = ({
-  children,
-  shouldWrap = true,
-  icon,
-  warning,
-  disabled,
-}: {
-  children: (data: { disabled: boolean }) => ReactNode;
-  shouldWrap?: boolean;
-  icon?: IconName;
-  warning: string;
-  disabled: boolean;
-}) => {
-  if (!shouldWrap) {
-    return children({ disabled });
-  }
-
-  return (
-    <Flex align="center" gap="xs">
-      {children({ disabled })}
-
-      {disabled && (
-        <HoverCard position="bottom">
-          <HoverCard.Target>
-            <Icon
-              name={icon ?? "info"}
-              size={14}
-              c="text-medium"
-              cursor="pointer"
-              style={{ flexShrink: 0 }}
-            />
-          </HoverCard.Target>
-          <HoverCard.Dropdown>
-            <Text lh="md" p="md">
-              {warning}
-            </Text>
-          </HoverCard.Dropdown>
-        </HoverCard>
-      )}
-    </Flex>
   );
 };

@@ -5,6 +5,7 @@ import _ from "underscore";
 import { PLUGIN_METABOT } from "metabase/plugins";
 import { Card, Radio, Stack, Text } from "metabase/ui";
 import { ALLOWED_EMBED_SETTING_KEYS_MAP } from "metabase-enterprise/embedding_iframe_sdk/constants";
+import { WithNotAvailableForOssUpsellTooltip } from "metabase-enterprise/embedding_iframe_sdk_setup/components/warnings/WithNotAvailableForOssUpsellTooltip";
 
 import {
   EMBED_FALLBACK_DASHBOARD_ID,
@@ -17,6 +18,7 @@ import { getDefaultSdkIframeEmbedSettings } from "../utils/get-default-sdk-ifram
 
 export const SelectEmbedExperienceStep = () => {
   const {
+    isEE,
     isStaticEmbeddingEnabled,
     initialState,
     experience,
@@ -61,7 +63,7 @@ export const SelectEmbedExperienceStep = () => {
     });
   };
 
-  const experiences = getEmbedExperiences({ isMetabotAvailable });
+  const experiences = getEmbedExperiences({ isEE, isMetabotAvailable });
 
   return (
     <Card p="md" mb="md">
@@ -79,12 +81,19 @@ export const SelectEmbedExperienceStep = () => {
       >
         <Stack gap="md">
           {experiences.map((experience) => (
-            <Radio
+            <WithNotAvailableForOssUpsellTooltip
               key={experience.value}
-              value={experience.value}
-              label={experience.title}
-              description={experience.description}
-            />
+              shouldWrap={experience.showUpsell === true}
+            >
+              {({ disabled }) => (
+                <Radio
+                  value={experience.value}
+                  label={experience.title}
+                  description={experience.description}
+                  disabled={disabled}
+                />
+              )}
+            </WithNotAvailableForOssUpsellTooltip>
           ))}
         </Stack>
       </Radio.Group>
