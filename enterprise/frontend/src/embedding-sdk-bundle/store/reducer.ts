@@ -111,7 +111,7 @@ export const setUsageProblem = createAction<SdkUsageProblem | null>(
 );
 
 const initialState: SdkState = {
-  isStaticEmbedding: false,
+  isStaticEmbedding: null,
   metabaseInstanceUrl: "",
   metabaseInstanceVersion: null,
   token: {

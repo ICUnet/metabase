@@ -605,7 +605,6 @@ export const PLUGIN_EMBEDDING_SDK = {
 
 export const PLUGIN_EMBEDDING_IFRAME_SDK = {
   hasValidLicense: () => false,
-  SdkIframeEmbedRoute: (): ReactNode => null,
 };
 
 export type SdkIframeEmbedSetupModalProps = {
@@ -624,9 +623,6 @@ export type SdkIframeEmbedSetupModalInitialState = {
 export const PLUGIN_EMBEDDING_IFRAME_SDK_SETUP = {
   isFeatureEnabled: () => false,
   shouldShowEmbedInNewItemMenu: () => false,
-  SdkIframeEmbedSetupModal: (
-    _props: SdkIframeEmbedSetupModalProps,
-  ): ReactNode => null,
 };
 
 export const PLUGIN_CONTENT_VERIFICATION = {
