@@ -107,16 +107,23 @@
 ;; for debugging purposes the implementation of [[=]] for two columns return the "reason" things are not equal so we
 ;; can log this; [[=]] is basically just (not <reason>)
 
+(defn- faster-not=
+  "Just like `clojure.core/not=`, but provides a faster path when both arguments are Long objects."
+  [a b]
+  (not (if (and (instance? Long a) (instance? Long b))
+         (.equals ^Long a b)
+         (= a b))))
+
 (defn- columns-not-equal-by-fn-when-non-nil-in-both
   [f col-1 col-2]
   (let [v1 (f col-1)
         v2 (f col-2)]
-    (when (and v1 v2 (not= v1 v2))
+    (when (and v1 v2 (faster-not= v1 v2))
       f)))
 
 (defn- columns-not-equal-by-fn
   [f col-1 col-2]
-  (when (not= (f col-1) (f col-2))
+  (when (faster-not= (f col-1) (f col-2))
     f))
 
 (defn- ignore-default-temporal-bucket [bucket]
