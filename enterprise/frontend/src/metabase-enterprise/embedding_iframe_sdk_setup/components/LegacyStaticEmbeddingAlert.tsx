@@ -11,7 +11,7 @@ import { getResourceTypeFromExperience } from "metabase-enterprise/embedding_ifr
 import type { Card, Dashboard } from "metabase-types/api";
 
 export const LegacyStaticEmbeddingAlert = () => {
-  const { settings, resource, experience, onClose } =
+  const { isStaticEmbeddingEnabled, settings, resource, experience, onClose } =
     useSdkIframeEmbedSetupContext();
 
   const dispatch = useDispatch();
@@ -22,6 +22,7 @@ export const LegacyStaticEmbeddingAlert = () => {
     resourceType === "dashboard" || resourceType === "question";
 
   if (
+    !isStaticEmbeddingEnabled ||
     !isStaticEmbedding ||
     !resource ||
     !resourceType ||
