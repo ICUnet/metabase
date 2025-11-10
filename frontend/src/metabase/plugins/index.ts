@@ -143,13 +143,13 @@ export const PLUGIN_WHITELABEL = {
 };
 
 export const PLUGIN_ADMIN_SETTINGS: {
-  InteractiveEmbeddingSettings: ComponentType | null;
+  InteractiveEmbeddingSettingsCard: ComponentType | null;
   LicenseAndBillingSettings: ComponentType;
   useUpsellFlow: (props: { campaign: string; location: string }) => {
     triggerUpsellFlow: (() => void) | undefined;
   };
 } = {
-  InteractiveEmbeddingSettings: null,
+  InteractiveEmbeddingSettingsCard: null,
   LicenseAndBillingSettings: PluginPlaceholder,
   useUpsellFlow: (_props: {
     campaign: string;

@@ -17,7 +17,7 @@ import {
 } from "metabase-types/api/mocks";
 import { createMockState } from "metabase-types/store/mocks";
 
-import { EmbeddingSdkSettings } from "../EmbeddingSdkSettings";
+import { EmbeddingSettings } from "../EmbeddingSettings";
 
 export interface SetupOpts {
   showSdkEmbedTerms?: Settings["show-sdk-embed-terms"];
@@ -63,7 +63,7 @@ export async function setup({
     value: true,
   });
 
-  renderWithProviders(<EmbeddingSdkSettings />, {
+  renderWithProviders(<EmbeddingSettings />, {
     storeInitialState: state,
   });
 

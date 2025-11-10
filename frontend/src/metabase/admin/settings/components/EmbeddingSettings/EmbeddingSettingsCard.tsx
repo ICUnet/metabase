@@ -1,3 +1,5 @@
+import type { PropsWithChildren } from "react";
+
 import ExternalLink from "metabase/common/components/ExternalLink";
 import {
   Alert,
@@ -16,6 +18,7 @@ import { EmbeddingToggle } from "./EmbeddingToggle";
 type LinkItem = { icon: IconName; title: string; href: string };
 
 export function EmbeddingSettingsCard({
+  children,
   title,
   description,
   settingKey,
@@ -25,7 +28,7 @@ export function EmbeddingSettingsCard({
   alertInfoText,
   actionButton,
   testId,
-}: {
+}: PropsWithChildren<{
   title: string;
   description: string;
   settingKey:
@@ -39,7 +42,7 @@ export function EmbeddingSettingsCard({
   alertInfoText?: React.ReactNode;
   actionButton?: React.ReactNode;
   testId?: string;
-}) {
+}>) {
   const hasLinksContent = links && links.length > 0;
 
   return (
@@ -86,6 +89,8 @@ export function EmbeddingSettingsCard({
           </Alert>
         )}
       </Stack>
+
+      {children}
 
       {(hasLinksContent || actionButton) && (
         <Group

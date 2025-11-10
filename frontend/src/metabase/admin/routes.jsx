@@ -22,8 +22,8 @@ import { UserSuccessModal } from "metabase/admin/people/containers/UserSuccessMo
 import { PerformanceApp } from "metabase/admin/performance/components/PerformanceApp";
 import getAdminPermissionsRoutes from "metabase/admin/permissions/routes";
 import {
-  EmbeddingSdkSettings,
   EmbeddingSecuritySettings,
+  EmbeddingSettings,
   StaticEmbeddingSettings,
 } from "metabase/admin/settings/components/EmbeddingSettings";
 import { Help } from "metabase/admin/tools/components/Help";
@@ -41,9 +41,9 @@ import { ToolsApp } from "metabase/admin/tools/components/ToolsApp";
 import { EmbeddingHubAdminSettingsPage } from "metabase/embedding/embedding-hub";
 import { ModalRoute } from "metabase/hoc/ModalRoute";
 import { Route } from "metabase/hoc/Title";
+import { isEEBuild } from "metabase/lib/utils";
 import { DataModel } from "metabase/metadata/pages/DataModel";
 import {
-  PLUGIN_ADMIN_SETTINGS,
   PLUGIN_ADMIN_TOOLS,
   PLUGIN_ADMIN_USER_MENU_ROUTES,
   PLUGIN_CACHING,
@@ -56,7 +56,6 @@ import {
 import { ModelPersistenceConfiguration } from "./performance/components/ModelPersistenceConfiguration";
 import { StrategyEditorForDatabases } from "./performance/components/StrategyEditorForDatabases";
 import { PerformanceTabId } from "./performance/types";
-import { InteractiveEmbeddingUpsellPage } from "./settings/components/EmbeddingSettings/InteractiveEmbeddingUpsellPage";
 import { getSettingsRoutes } from "./settingsRoutes";
 import { ToolsUpsell } from "./tools/components/ToolsUpsell";
 import { RedirectToAllowedSettings, createAdminRouteGuard } from "./utils";
@@ -156,25 +155,16 @@ const getRoutes = (store, CanAccessSettings, IsAdmin) => (
           />
           <Route
             path="modular"
-            title={t`Modular`}
-            component={EmbeddingSdkSettings}
+            title={t`Settings`}
+            component={EmbeddingSettings}
           />
-          <Route
-            path="interactive"
-            title={t`Interactive`}
-            component={() => {
-              if (PLUGIN_ADMIN_SETTINGS.InteractiveEmbeddingSettings) {
-                return <PLUGIN_ADMIN_SETTINGS.InteractiveEmbeddingSettings />;
-              }
-
-              return <InteractiveEmbeddingUpsellPage />;
-            }}
-          />
-          <Route
-            path="static"
-            title={t`Static`}
-            component={StaticEmbeddingSettings}
-          />
+          {isEEBuild() && (
+            <Route
+              path="static"
+              title={t`Unauthenticated embeds`}
+              component={StaticEmbeddingSettings}
+            />
+          )}
           <Route
             path="security"
             title={t`Security`}
@@ -183,6 +173,14 @@ const getRoutes = (store, CanAccessSettings, IsAdmin) => (
         </Route>
       </Route>
 
+      {/* EE has all embedding settings on the same page */}
+      {!isEEBuild() && (
+        <Redirect
+          from="/admin/embedding/static"
+          to="/admin/embedding/modular"
+        />
+      )}
+
       {/* Backwards compatibility for embedding settings */}
       <Redirect
         from="/admin/settings/embedding-in-other-applications"
@@ -190,7 +188,7 @@ const getRoutes = (store, CanAccessSettings, IsAdmin) => (
       />
       <Redirect
         from="/admin/settings/embedding-in-other-applications/full-app"
-        to="/admin/embedding/interactive"
+        to="/admin/embedding/modular"
       />
       <Redirect
         from="/admin/settings/embedding-in-other-applications/standalone"

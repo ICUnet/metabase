@@ -16,7 +16,7 @@ import {
   createMockSettings,
 } from "metabase-types/api/mocks";
 
-import { StaticEmbeddingSettings } from "./StaticEmbeddingSettings";
+import { SharedStaticEmbeddingSettings } from "./SharedStaticEmbeddingSettings";
 
 const setup = async ({ enabled }: { enabled: boolean }) => {
   const settings = createMockSettings({ "enable-embedding-static": enabled });
@@ -38,27 +38,25 @@ const setup = async ({ enabled }: { enabled: boolean }) => {
     value: true,
   });
 
-  renderWithProviders(<StaticEmbeddingSettings />);
-
-  await screen.findByText("Static embedding"); // breadcrumb
+  renderWithProviders(<SharedStaticEmbeddingSettings />);
 };
 
-describe("StaticEmbeddingSettings", () => {
+describe("SharedStaticEmbeddingSettings", () => {
   it("should show embedding toggle", async () => {
     await setup({ enabled: true });
 
     expect(
-      await screen.findByText("Enable static embedding"),
+      await screen.findByText("Enable unauthenticated embeds"),
     ).toBeInTheDocument();
   });
 
   it("should toggle static embedding on", async () => {
     await setup({ enabled: false });
 
-    await screen.findByText("Enable static embedding");
+    await screen.findByText("Enable unauthenticated embeds");
 
     const toggle = screen.getByRole("switch", {
-      name: /Enable static embedding toggle/i,
+      name: /Enable unauthenticated embeds toggle/i,
     });
 
     await userEvent.click(toggle);
@@ -80,7 +78,7 @@ describe("StaticEmbeddingSettings", () => {
   it("should hide embeddable dashboards and cards when embedding is disabled", async () => {
     await setup({ enabled: false });
     expect(
-      await screen.findByText("Enable static embedding"),
+      await screen.findByText("Enable unauthenticated embeds"),
     ).toBeInTheDocument();
     expect(screen.queryByText("Manage embeds")).not.toBeInTheDocument();
   });
@@ -103,17 +101,5 @@ describe("StaticEmbeddingSettings", () => {
     const [{ url, body }] = puts;
     expect(url).toContain("/setting/embedding-secret-key");
     expect(body).toEqual({ value: "fake-token" }); // we got this from the mock api
-  });
-
-  it("should show cards with related settings", async () => {
-    await setup({ enabled: true });
-
-    const relatedSettingCards = await screen.findAllByTestId(
-      "related-setting-card",
-    );
-    expect(relatedSettingCards).toHaveLength(2);
-
-    expect(await screen.findByText("Databases")).toBeInTheDocument();
-    expect(await screen.findByText("Appearance")).toBeInTheDocument();
   });
 });

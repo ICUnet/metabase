@@ -10,7 +10,7 @@ import {
 import { fireEvent, renderWithProviders, screen } from "__support__/ui";
 import { createMockSettings } from "metabase-types/api/mocks";
 
-import { InteractiveEmbeddingSettings } from "./InteractiveEmbeddingSettings";
+import { InteractiveEmbeddingSettingsCard } from "./InteractiveEmbeddingSettingsCard";
 
 const setup = async ({ enabled }: { enabled: boolean }) => {
   const settings = createMockSettings({
@@ -26,24 +26,22 @@ const setup = async ({ enabled }: { enabled: boolean }) => {
     value: true,
   });
 
-  renderWithProviders(<InteractiveEmbeddingSettings />);
-
-  await screen.findByText("Interactive embedding"); // breadcrumb
+  renderWithProviders(<InteractiveEmbeddingSettingsCard />);
 };
 
-describe("InteractiveEmbeddingSettings", () => {
+describe("InteractiveEmbeddingSettingsCard", () => {
   it("should show interactive embedding toggle", async () => {
     await setup({ enabled: true });
 
     expect(
-      await screen.findByText("Enable interactive embedding"),
+      await screen.findByText("Enable legacy interactive embedding"),
     ).toBeInTheDocument();
   });
 
   it("should toggle interactive embedding on", async () => {
     await setup({ enabled: false });
     const toggle = await screen.findByLabelText(
-      "Enable interactive embedding toggle",
+      "Enable legacy interactive embedding toggle",
     );
 
     await userEvent.click(toggle);
@@ -52,12 +50,6 @@ describe("InteractiveEmbeddingSettings", () => {
     const [{ url, body }] = puts;
     expect(url).toContain("/setting/enable-embedding-interactive");
     expect(body).toEqual({ value: true });
-  });
-
-  it("should show quickstart link", async () => {
-    await setup({ enabled: true });
-
-    expect(await screen.findByText("Quick start")).toBeInTheDocument();
   });
 
   it("should allow changing authorized origins", async () => {
@@ -73,21 +65,5 @@ describe("InteractiveEmbeddingSettings", () => {
     const [{ url, body }] = puts;
     expect(url).toContain("/setting/embedding-app-origins-interactive");
     expect(body).toEqual({ value: "https://*.foo.example.com" });
-  });
-
-  it("should show cards with related settings", async () => {
-    await setup({ enabled: true });
-
-    const relatedSettingCards = await screen.findAllByTestId(
-      "related-setting-card",
-    );
-    expect(relatedSettingCards).toHaveLength(6);
-
-    expect(await screen.findByText("Authentication")).toBeInTheDocument();
-    expect(await screen.findByText("Databases")).toBeInTheDocument();
-    expect(await screen.findByText("People")).toBeInTheDocument();
-    expect(await screen.findByText("Permissions")).toBeInTheDocument();
-    expect(await screen.findByText("Embedded Metabot")).toBeInTheDocument();
-    expect(await screen.findByText("Appearance")).toBeInTheDocument();
   });
 });
