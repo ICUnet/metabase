@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Flex, HoverCard, Icon, type IconName, Text } from "metabase/ui";
+import { Box, Flex, HoverCard, Icon } from "metabase/ui";
 
 export const TooltipWarning = ({
   children,
@@ -11,8 +11,8 @@ export const TooltipWarning = ({
 }: {
   children: (data: { disabled: boolean }) => ReactNode;
   shouldWrap?: boolean;
-  icon?: IconName;
-  warning: string;
+  icon?: ReactNode;
+  warning: ReactNode;
   disabled: boolean;
 }) => {
   if (!shouldWrap) {
@@ -20,25 +20,25 @@ export const TooltipWarning = ({
   }
 
   return (
-    <Flex align="center" gap="xs">
+    <Flex align="baseline" gap="xs">
       {children({ disabled })}
 
       {disabled && (
         <HoverCard position="bottom">
           <HoverCard.Target>
-            <Icon
-              name={icon ?? "info"}
-              size={14}
-              c="text-medium"
-              cursor="pointer"
-              style={{ flexShrink: 0 }}
-            />
+            <Box>
+              {icon ?? (
+                <Icon
+                  name={"info"}
+                  size={14}
+                  c="text-medium"
+                  cursor="pointer"
+                  style={{ flexShrink: 0 }}
+                />
+              )}
+            </Box>
           </HoverCard.Target>
-          <HoverCard.Dropdown>
-            <Text lh="md" p="md">
-              {warning}
-            </Text>
-          </HoverCard.Dropdown>
+          <HoverCard.Dropdown>{warning}</HoverCard.Dropdown>
         </HoverCard>
       )}
     </Flex>

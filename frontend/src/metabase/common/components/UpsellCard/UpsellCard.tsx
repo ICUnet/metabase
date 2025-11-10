@@ -3,14 +3,17 @@ import { useMount } from "react-use";
 
 import { Box, Flex, Image, Stack, Text, Title } from "metabase/ui";
 
-import { UPGRADE_URL } from "../constants";
+import { UpsellCta } from "../../../admin/upsells/components/UpsellCta";
+import { UpsellGem } from "../../../admin/upsells/components/UpsellGem";
+import { UpsellWrapper } from "../../../admin/upsells/components/UpsellWrapper";
+import {
+  trackUpsellClicked,
+  trackUpsellViewed,
+} from "../../../admin/upsells/components/analytics";
+import { useUpsellLink } from "../../../admin/upsells/components/use-upsell-link";
+import { UPGRADE_URL } from "../../../admin/upsells/constants";
 
 import S from "./UpsellCard.module.css";
-import { UpsellCta } from "./UpsellCta";
-import { UpsellGem } from "./UpsellGem";
-import { UpsellWrapper } from "./UpsellWrapper";
-import { trackUpsellClicked, trackUpsellViewed } from "./analytics";
-import { useUpsellLink } from "./use-upsell-link";
 
 type CardWidthProps =
   | {

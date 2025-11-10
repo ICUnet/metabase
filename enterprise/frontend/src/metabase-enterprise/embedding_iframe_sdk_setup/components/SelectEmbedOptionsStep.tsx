@@ -348,7 +348,11 @@ const WithStaticIsDisabledWarning = ({
 
   return (
     <TooltipWarning
-      warning={t`Disabled in the admin settings`}
+      warning={
+        <Text lh="md" p="md">
+          {t`Disabled in the admin settings`}
+        </Text>
+      }
       disabled={disabled}
     >
       {children}
@@ -368,11 +372,17 @@ const WithNotAvailableForStaticEmbeddingWarning = ({
       {({ disabled: disabledForOss }) => (
         <TooltipWarning
           shouldWrap={!disabledForOss}
-          warning={t`Not available if unauthenticated is selected`}
+          warning={
+            <Text lh="md" p="md">
+              {t`Not available if unauthenticated is selected`}
+            </Text>
+          }
           disabled={!!settings.isStatic}
         >
           {({ disabled: disabledForStaticEmbedding }) =>
-            children({ disabled: disabledForOss || disabledForStaticEmbedding })
+            children({
+              disabled: disabledForOss || disabledForStaticEmbedding,
+            })
           }
         </TooltipWarning>
       )}
