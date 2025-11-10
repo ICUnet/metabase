@@ -2,6 +2,8 @@ import { t } from "ttag";
 
 import Modal from "metabase/common/components/Modal";
 import { useOpenEmbedJsWizard } from "metabase/embedding/hooks/use-open-embed-js-wizard";
+import { useSelector } from "metabase/lib/redux";
+import type { SdkIframeEmbedSetupModalProps } from "metabase/plugins";
 import { StaticEmbedSetupPane } from "metabase/public/components/EmbedModal/StaticEmbedSetupPane";
 import type {
   EmbedResource,
@@ -9,6 +11,7 @@ import type {
   EmbeddingParameters,
   StaticEmbedResourceType,
 } from "metabase/public/lib/types";
+import { getCurrentOpenModalState } from "metabase/selectors/ui";
 
 import { EmbedModalHeader } from "./EmbedModal.styled";
 
@@ -32,9 +35,11 @@ export const EmbedModal = ({
   onUpdateEmbeddingParams,
   onClose,
 }: EmbedModalProps) => {
+  const { props: embedJsWizardProps } = useSelector(
+    getCurrentOpenModalState<SdkIframeEmbedSetupModalProps>,
+  );
   const openEmbedJsWizard = useOpenEmbedJsWizard({
-    resource,
-    resourceType,
+    initialState: embedJsWizardProps?.initialState,
   });
 
   const onEmbedClose = () => {

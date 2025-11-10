@@ -33,8 +33,12 @@ export const useSharingModal = <
   const [modalType, setModalType] = useState<TModalType | null>(null);
 
   const openEmbedJsWizard = useOpenEmbedJsWizard({
-    resource,
-    resourceType,
+    initialState: {
+      resourceId: resource.id,
+      resourceType,
+      isStatic: true,
+      useExistingUserSession: true,
+    },
   });
 
   useEffect(() => {

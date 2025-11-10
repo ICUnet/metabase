@@ -2,30 +2,19 @@ import { useCallback } from "react";
 
 import { useDispatch } from "metabase/lib/redux";
 import type { SdkIframeEmbedSetupModalProps } from "metabase/plugins";
-import type {
-  EmbedResource,
-  EmbedResourceType,
-} from "metabase/public/lib/types";
 import { setOpenModalWithProps } from "metabase/redux/ui";
 
 export const useOpenEmbedJsWizard = ({
-  resource,
-  resourceType,
+  initialState,
 }: {
-  resource: EmbedResource;
-  resourceType: EmbedResourceType;
+  initialState: SdkIframeEmbedSetupModalProps["initialState"];
 }) => {
   const dispatch = useDispatch();
 
   return useCallback(
     ({ onBeforeOpen }: { onBeforeOpen?: () => void }) => {
       const modalProps: Pick<SdkIframeEmbedSetupModalProps, "initialState"> = {
-        initialState: {
-          resourceType,
-          resourceId: resource.id,
-          isStatic: true,
-          useExistingUserSession: false,
-        },
+        initialState,
       };
 
       onBeforeOpen?.();
@@ -37,6 +26,6 @@ export const useOpenEmbedJsWizard = ({
         }),
       );
     },
-    [dispatch, resource.id, resourceType],
+    [dispatch, initialState],
   );
 };
