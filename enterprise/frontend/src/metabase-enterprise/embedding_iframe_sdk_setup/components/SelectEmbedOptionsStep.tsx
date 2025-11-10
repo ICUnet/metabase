@@ -361,16 +361,21 @@ const WithNotAvailableForStaticEmbeddingWarning = ({
 }: {
   children: (data: { disabled: boolean }) => ReactNode;
 }) => {
-  const { settings } = useSdkIframeEmbedSetupContext();
-
-  const disabled = !!settings.isStatic;
+  const { isEE, settings } = useSdkIframeEmbedSetupContext();
 
   return (
-    <TooltipWarning
-      warning={t`Not available if unauthenticated is selected`}
-      disabled={disabled}
-    >
-      {children}
-    </TooltipWarning>
+    <WithNotAvailableForOssUpsellTooltip shouldWrap={!isEE}>
+      {({ disabled: disabledForOss }) => (
+        <TooltipWarning
+          shouldWrap={!disabledForOss}
+          warning={t`Not available if unauthenticated is selected`}
+          disabled={!!settings.isStatic}
+        >
+          {({ disabled: disabledForStaticEmbedding }) =>
+            children({ disabled: disabledForOss || disabledForStaticEmbedding })
+          }
+        </TooltipWarning>
+      )}
+    </WithNotAvailableForOssUpsellTooltip>
   );
 };
