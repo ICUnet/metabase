@@ -1,3 +1,4 @@
+import { setupEnterprisePlugins } from "__support__/enterprise";
 import {
   findRequests,
   setupDashboardEndpoints,
@@ -22,10 +23,13 @@ import {
 import { SdkIframeEmbedSetupModal } from "../SdkIframeEmbedSetupModal";
 
 export const setup = (options?: {
+  hasEnterprisePlugins?: boolean;
   simpleEmbeddingEnabled?: boolean;
   jwtReady?: boolean;
   initialState?: SdkIframeEmbedSetupModalInitialState;
 }) => {
+  const { hasEnterprisePlugins = true } = options ?? {};
+
   const mockDatabase = createMockDatabase();
   const mockDashboard = createMockDashboard();
   setupRecentViewsAndSelectionsEndpoints([], ["selections", "views"]);
@@ -39,6 +43,10 @@ export const setup = (options?: {
   );
   setupUpdateSettingsEndpoint();
   setupUpdateSettingEndpoint();
+
+  if (hasEnterprisePlugins) {
+    setupEnterprisePlugins();
+  }
 
   renderWithProviders(
     <SdkIframeEmbedSetupModal
@@ -61,14 +69,6 @@ export const setup = (options?: {
     },
   );
 };
-
-export async function waitForPutRequests() {
-  return waitFor(async () => {
-    const puts = await findRequests("PUT");
-    expect(puts.length).toBeGreaterThan(0);
-    return puts;
-  });
-}
 
 export async function waitForUpdateSetting(settingKey: string, value: any) {
   return waitFor(async () => {

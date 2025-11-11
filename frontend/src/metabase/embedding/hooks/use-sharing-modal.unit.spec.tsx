@@ -1,7 +1,10 @@
 import { act, renderHook } from "@testing-library/react";
 
 import type { DashboardSharingModalType } from "metabase/embedding/components/SharingMenu/types";
-import { STATIC_LEGACY_EMBEDDING_TYPE } from "metabase/embedding/constants";
+import {
+  STATIC_EMBED_JS_EMBEDDING_TYPE,
+  STATIC_LEGACY_EMBEDDING_TYPE,
+} from "metabase/embedding/constants";
 import { setOpenModal, setOpenModalWithProps } from "metabase/redux/ui";
 import type { Dashboard } from "metabase-types/api";
 
@@ -15,12 +18,6 @@ jest.mock("metabase/lib/redux", () => ({
   useSelector: (selector: any) => mockSelector(selector),
 }));
 
-jest.mock("metabase/lib/utils", () => ({
-  isEEBuild: jest.fn(),
-}));
-
-const { isEEBuild } = jest.requireMock("metabase/lib/utils");
-
 const mockResource = { id: 1 } as Dashboard;
 const mockResourceType = "dashboard" as const;
 
@@ -28,7 +25,6 @@ describe("useSharingModal", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSelector.mockReturnValue(null);
-    isEEBuild.mockReturnValue(false);
   });
 
   it("should initialize with null modalType", () => {
@@ -104,113 +100,83 @@ describe("useSharingModal", () => {
     expect(result.current.modalType).toBe(STATIC_LEGACY_EMBEDDING_TYPE);
   });
 
-  describe("OSS build", () => {
-    beforeEach(() => {
-      isEEBuild.mockReturnValue(false);
+  it("should set modalType for STATIC_LEGACY_EMBEDDING_TYPE", () => {
+    const { result } = renderHook(() =>
+      useSharingModal<DashboardSharingModalType>({
+        resource: mockResource,
+        resourceType: mockResourceType,
+      }),
+    );
+
+    act(() => {
+      result.current.setModalType(STATIC_LEGACY_EMBEDDING_TYPE);
     });
 
-    it("should set modalType manually in OSS build", () => {
-      const { result } = renderHook(() =>
-        useSharingModal<DashboardSharingModalType>({
-          resource: mockResource,
-          resourceType: mockResourceType,
-        }),
-      );
-
-      act(() => {
-        result.current.setModalType(STATIC_LEGACY_EMBEDDING_TYPE);
-      });
-
-      expect(result.current.modalType).toBe(STATIC_LEGACY_EMBEDDING_TYPE);
-      expect(mockDispatch).not.toHaveBeenCalled();
-    });
-
-    it("should dispatch setOpenModal(null) when clearing modalType in OSS", () => {
-      mockSelector.mockReturnValue(STATIC_LEGACY_EMBEDDING_TYPE);
-
-      const { result } = renderHook(() =>
-        useSharingModal<DashboardSharingModalType>({
-          resource: mockResource,
-          resourceType: mockResourceType,
-        }),
-      );
-
-      act(() => {
-        result.current.setModalType(null);
-      });
-
-      expect(result.current.modalType).toBeNull();
-      expect(mockDispatch).toHaveBeenCalledWith(setOpenModal(null));
-    });
+    expect(result.current.modalType).toBe(STATIC_LEGACY_EMBEDDING_TYPE);
+    expect(mockDispatch).not.toHaveBeenCalled();
   });
 
-  describe("EE build", () => {
-    beforeEach(() => {
-      isEEBuild.mockReturnValue(true);
+  it("should dispatch setOpenModal(null) when clearing modalType", () => {
+    mockSelector.mockReturnValue(STATIC_LEGACY_EMBEDDING_TYPE);
+
+    const { result } = renderHook(() =>
+      useSharingModal<DashboardSharingModalType>({
+        resource: mockResource,
+        resourceType: mockResourceType,
+      }),
+    );
+
+    act(() => {
+      result.current.setModalType(null);
     });
 
-    it("should open EmbedJS wizard in EE build when setting modalType", () => {
-      const { result } = renderHook(() =>
-        useSharingModal<DashboardSharingModalType>({
-          resource: mockResource,
-          resourceType: mockResourceType,
-        }),
-      );
+    expect(result.current.modalType).toBeNull();
+    expect(mockDispatch).toHaveBeenCalledWith(setOpenModal(null));
+  });
 
-      act(() => {
-        result.current.setModalType(STATIC_LEGACY_EMBEDDING_TYPE);
-      });
+  it("should open EmbedJS wizard when setting STATIC_EMBED_JS_EMBEDDING_TYPE", () => {
+    const { result } = renderHook(() =>
+      useSharingModal<DashboardSharingModalType>({
+        resource: mockResource,
+        resourceType: mockResourceType,
+      }),
+    );
 
-      expect(mockDispatch).toHaveBeenCalledWith(
-        setOpenModalWithProps({
-          id: "embed",
-          props: {
-            initialState: {
-              resourceType: mockResourceType,
-              resourceId: mockResource.id,
-              isStatic: true,
-              useExistingUserSession: false,
-            },
+    act(() => {
+      result.current.setModalType(STATIC_EMBED_JS_EMBEDDING_TYPE);
+    });
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      setOpenModalWithProps({
+        id: "embed",
+        props: {
+          initialState: {
+            resourceType: mockResourceType,
+            resourceId: mockResource.id,
+            isStatic: true,
+            useExistingUserSession: true,
           },
-        }),
-      );
+        },
+      }),
+    );
+  });
+
+  it("should clear modalType before opening EmbedJS wizard", () => {
+    mockSelector.mockReturnValue(STATIC_LEGACY_EMBEDDING_TYPE);
+
+    const { result } = renderHook(() =>
+      useSharingModal<DashboardSharingModalType>({
+        resource: mockResource,
+        resourceType: mockResourceType,
+      }),
+    );
+
+    expect(result.current.modalType).toBe(STATIC_LEGACY_EMBEDDING_TYPE);
+
+    act(() => {
+      result.current.setModalType(STATIC_EMBED_JS_EMBEDDING_TYPE);
     });
 
-    it("should clear modalType before opening EmbedJS wizard in EE build", () => {
-      mockSelector.mockReturnValue(STATIC_LEGACY_EMBEDDING_TYPE);
-
-      const { result } = renderHook(() =>
-        useSharingModal<DashboardSharingModalType>({
-          resource: mockResource,
-          resourceType: mockResourceType,
-        }),
-      );
-
-      expect(result.current.modalType).toBe(STATIC_LEGACY_EMBEDDING_TYPE);
-
-      act(() => {
-        result.current.setModalType(STATIC_LEGACY_EMBEDDING_TYPE);
-      });
-
-      expect(result.current.modalType).toBeNull();
-    });
-
-    it("should dispatch setOpenModal(null) when clearing modalType in EE", () => {
-      mockSelector.mockReturnValue(STATIC_LEGACY_EMBEDDING_TYPE);
-
-      const { result } = renderHook(() =>
-        useSharingModal<DashboardSharingModalType>({
-          resource: mockResource,
-          resourceType: mockResourceType,
-        }),
-      );
-
-      act(() => {
-        result.current.setModalType(null);
-      });
-
-      expect(result.current.modalType).toBeNull();
-      expect(mockDispatch).toHaveBeenCalledWith(setOpenModal(null));
-    });
+    expect(result.current.modalType).toBeNull();
   });
 });

@@ -43,6 +43,10 @@ describe("Embed flow > forward and backward navigation", () => {
     expect(screen.getByRole("button", { name: "Back" })).toBeEnabled();
 
     await userEvent.click(screen.getByRole("button", { name: "Next" }));
+
+    expect(
+      screen.getByText("Choose the authentication method for embedding:"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Behavior")).toBeInTheDocument();
     expect(screen.getByText("Appearance")).toBeInTheDocument();
     expect(
@@ -50,9 +54,7 @@ describe("Embed flow > forward and backward navigation", () => {
     ).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Get code" }));
-    expect(
-      screen.getByText("Choose the authentication method for embedding:"),
-    ).toBeInTheDocument();
+
     expect(
       screen.queryByRole("button", { name: "Next" }),
     ).not.toBeInTheDocument();

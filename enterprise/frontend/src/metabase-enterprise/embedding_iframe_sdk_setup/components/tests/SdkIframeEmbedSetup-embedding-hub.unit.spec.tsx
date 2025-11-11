@@ -27,7 +27,6 @@ describe("Embed flow > embedding hub step completion tracking", () => {
 
       await userEvent.click(screen.getByRole("button", { name: "Next" }));
       await userEvent.click(screen.getByRole("button", { name: "Next" }));
-      await userEvent.click(screen.getByRole("button", { name: "Get code" }));
 
       const authRadio = screen.getByDisplayValue(
         useExistingUserSession ? "user-session" : "sso",
@@ -35,6 +34,8 @@ describe("Embed flow > embedding hub step completion tracking", () => {
 
       await userEvent.click(authRadio);
       expect(authRadio).toBeChecked();
+
+      await userEvent.click(screen.getByRole("button", { name: "Get code" }));
 
       const actionButton = screen.getByRole("button", {
         name: trigger === "copy" ? /Copy code/ : /Done/,
