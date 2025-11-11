@@ -115,7 +115,7 @@
                              "spark-deps.jar is no longer needed by Metabase 0.32.0+. You can delete it from the plugins directory.")))]
     path))
 
-(when (or config/is-dev? config/is-test?)
+(when (not config/is-prod?)
   (defn- load-local-plugin-manifest! [^Path path]
     (some-> (slurp (str path)) yaml/parse-string plugins.init/init-plugin-with-info!))
 
@@ -170,7 +170,7 @@
   (extract-system-modules!)
   (let [paths (plugins-paths)]
     (init-plugins! paths))
-  (when (or config/is-dev? config/is-test?)
+  (when (not config/is-prod?)
     (load-local-plugin-manifests!)))
 
 (defonce ^:private loaded? (atom false))
