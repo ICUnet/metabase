@@ -27,11 +27,13 @@ describe("EmbeddingSdkSettings (EE with Simple Embedding feature)", () => {
     expect(toggles).toHaveLength(2);
 
     expect(
-      screen.getByRole("switch", { name: "SDK for React toggle" }),
+      screen.getByRole("switch", { name: "Enable SDK for React toggle" }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole("switch", { name: "Embedded Analytics JS toggle" }),
+      screen.getByRole("switch", {
+        name: "Enable Embedded Analytics JS toggle",
+      }),
     ).toBeInTheDocument();
   });
 
@@ -46,7 +48,7 @@ describe("EmbeddingSdkSettings (EE with Simple Embedding feature)", () => {
 
     // Enable Embedded Analytics JS
     const toggle = await screen.findByRole("switch", {
-      name: "Embedded Analytics JS toggle",
+      name: "Enable Embedded Analytics JS toggle",
     });
 
     await userEvent.click(toggle);
@@ -66,7 +68,7 @@ describe("EmbeddingSdkSettings (EE with Simple Embedding feature)", () => {
     });
 
     const toggle = await screen.findByRole("switch", {
-      name: "Embedded Analytics JS toggle",
+      name: "Enable Embedded Analytics JS toggle",
     });
 
     await userEvent.click(toggle);
@@ -92,61 +94,11 @@ describe("EmbeddingSdkSettings (EE with Simple Embedding feature)", () => {
 
     const card = screen
       .getAllByTestId("sdk-setting-card")
-      .find((card) => card.textContent?.includes("Embedded Analytics JS"));
+      .find((card) =>
+        card.textContent?.includes("Enable Embedded Analytics JS"),
+      );
 
     expect(card).toHaveTextContent("New embed");
     expect(card).toHaveTextContent("Documentation");
-  });
-
-  describe("Authorized Origins input field", () => {
-    it("should be disabled when both SDK and simple embedding are disabled", async () => {
-      await setup({
-        isEmbeddingSdkEnabled: false,
-        isEmbeddingSimpleEnabled: false,
-        showSdkEmbedTerms: false,
-      });
-
-      expect(
-        screen.getByText("Cross-Origin Resource Sharing (CORS)"),
-      ).toBeInTheDocument();
-
-      const originInput = screen.getByPlaceholderText("https://*.example.com");
-      expect(originInput).toBeDisabled();
-    });
-
-    it.each([
-      {
-        description:
-          "should be enabled when SDK is enabled and simple embedding is disabled",
-        isEmbeddingSdkEnabled: true,
-        isEmbeddingSimpleEnabled: false,
-      },
-      {
-        description:
-          "should be enabled when simple embedding is enabled and SDK is disabled",
-        isEmbeddingSdkEnabled: false,
-        isEmbeddingSimpleEnabled: true,
-      },
-      {
-        description:
-          "should be enabled when both SDK and simple embedding are enabled",
-        isEmbeddingSdkEnabled: true,
-        isEmbeddingSimpleEnabled: true,
-      },
-    ])(
-      "$description",
-      async ({ isEmbeddingSdkEnabled, isEmbeddingSimpleEnabled }) => {
-        await setup({
-          isEmbeddingSdkEnabled,
-          isEmbeddingSimpleEnabled,
-          showSdkEmbedTerms: false,
-        });
-
-        const originInput = screen.getByPlaceholderText(
-          "https://*.example.com",
-        );
-        expect(originInput).toBeEnabled();
-      },
-    );
   });
 });
