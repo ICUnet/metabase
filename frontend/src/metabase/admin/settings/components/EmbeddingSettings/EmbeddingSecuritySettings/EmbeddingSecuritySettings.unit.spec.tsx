@@ -1,31 +1,38 @@
 import userEvent from "@testing-library/user-event";
 
-import {
-  findRequests,
-  setupPropertiesEndpoints,
-  setupSettingsEndpoints,
-  setupUpdateSettingEndpoint,
-} from "__support__/server-mocks";
-import { renderWithProviders, screen } from "__support__/ui";
-import { createMockSettings } from "metabase-types/api/mocks";
+import { findRequests } from "__support__/server-mocks";
+import { fireEvent, renderWithProviders, screen, within } from "__support__/ui";
+
+import { setup as baseSetup } from "../tests/setup";
 
 import { EmbeddingSecuritySettings } from "./EmbeddingSecuritySettings";
 
-const setup = async () => {
-  const settings = createMockSettings();
+const setup = async ({
+  showSdkEmbedTerms,
+  isEmbeddingSdkEnabled,
+}: {
+  showSdkEmbedTerms?: boolean;
+  isEmbeddingSdkEnabled?: boolean;
+} = {}) => {
+  await baseSetup({
+    renderCallback: ({ state }) =>
+      renderWithProviders(<EmbeddingSecuritySettings />, {
+        storeInitialState: state,
+      }),
+    showSdkEmbedTerms,
+    isEmbeddingSdkEnabled,
+    hasEnterprisePlugins: isEmbeddingSdkEnabled,
+    tokenFeatures: {
+      embedding_sdk: isEmbeddingSdkEnabled,
+    },
+  });
 
-  setupPropertiesEndpoints(settings);
-  setupSettingsEndpoints([]);
-  setupUpdateSettingEndpoint();
-
-  renderWithProviders(<EmbeddingSecuritySettings />);
+  expect(await screen.findByText("Security")).toBeInTheDocument();
 };
 
 describe("EmbeddingSecuritySettings", () => {
   it("should allow changing samesite cookie setting", async () => {
     await setup();
-
-    expect(await screen.findByText("Security")).toBeInTheDocument();
 
     expect(
       await screen.findByText("SameSite cookie setting"),
@@ -42,5 +49,30 @@ describe("EmbeddingSecuritySettings", () => {
     const [{ url, body }] = puts;
     expect(url).toContain("/setting/session-cookie-samesite");
     expect(body).toEqual({ value: "strict" });
+  });
+
+  it("should allow users to update CORS settings", async () => {
+    await setup({
+      isEmbeddingSdkEnabled: true,
+      showSdkEmbedTerms: false,
+    });
+
+    const input = within(
+      await screen.findByTestId("embedding-app-origins-sdk-setting"),
+    ).getByRole("textbox");
+
+    expect(input).toBeEnabled();
+    await userEvent.clear(input);
+    await userEvent.type(input, "fast.limos");
+    await fireEvent.blur(input);
+    await screen.findByDisplayValue("fast.limos");
+
+    const puts = await findRequests("PUT");
+    expect(puts).toHaveLength(1);
+    const [{ url, body }] = puts;
+    expect(url).toContain("api/setting/embedding-app-origins-sdk");
+    expect(body).toEqual({
+      value: "fast.limos",
+    });
   });
 });

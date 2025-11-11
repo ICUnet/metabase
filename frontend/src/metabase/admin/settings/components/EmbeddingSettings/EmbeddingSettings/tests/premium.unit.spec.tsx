@@ -1,7 +1,4 @@
-import userEvent from "@testing-library/user-event";
-
-import { findRequests } from "__support__/server-mocks";
-import { fireEvent, screen, within } from "__support__/ui";
+import { screen, within } from "__support__/ui";
 
 import { type SetupOpts, setup as baseSetup } from "./setup";
 
@@ -35,31 +32,6 @@ describe("EmbeddingSdkSettings (EE with Embedding SDK token)", () => {
     expect(
       alertInfo.getByText("implement JWT or SAML SSO"),
     ).toBeInTheDocument();
-  });
-
-  it("should allow users to update CORS settings", async () => {
-    await setup({
-      isEmbeddingSdkEnabled: true,
-      showSdkEmbedTerms: false,
-    });
-
-    const input = within(
-      await screen.findByTestId("embedding-app-origins-sdk-setting"),
-    ).getByRole("textbox");
-
-    expect(input).toBeEnabled();
-    await userEvent.clear(input);
-    await userEvent.type(input, "fast.limos");
-    await fireEvent.blur(input);
-    await screen.findByDisplayValue("fast.limos");
-
-    const puts = await findRequests("PUT");
-    expect(puts).toHaveLength(1);
-    const [{ url, body }] = puts;
-    expect(url).toContain("api/setting/embedding-app-origins-sdk");
-    expect(body).toEqual({
-      value: "fast.limos",
-    });
   });
 
   describe("Version pinning", () => {
