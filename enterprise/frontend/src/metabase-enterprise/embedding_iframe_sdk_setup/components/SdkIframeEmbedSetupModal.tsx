@@ -23,9 +23,8 @@ import {
   Modal,
   Stack,
 } from "metabase/ui";
-import { EnableEmbeddedAnalyticsCard } from "metabase-enterprise/embedding_iframe_sdk_setup/components/EnableEmbeddedAnalyticsCard";
-import { EnableStaticEmbeddingCard } from "metabase-enterprise/embedding_iframe_sdk_setup/components/EnableStaticEmbeddingCard";
 import { SdkIframeStaticEmbeddingStatusBar } from "metabase-enterprise/embedding_iframe_sdk_setup/components/SdkIframeStaticEmbeddingStatusBar";
+import { SdkIframeStepHeader } from "metabase-enterprise/embedding_iframe_sdk_setup/components/SdkIframeStepHeader";
 import type { SettingKey } from "metabase-types/api";
 
 import { useSdkIframeEmbedSetupContext } from "../context";
@@ -99,11 +98,7 @@ export const SdkIframeEmbedSetupContent = () => {
         <Box className={S.Sidebar} component="aside">
           <Stack className={S.SidebarContent} gap="md">
             <Stack gap="md">
-              {isSimpleEmbedFeatureAvailable ? (
-                <EnableEmbeddedAnalyticsCard />
-              ) : (
-                <EnableStaticEmbeddingCard />
-              )}
+              <SdkIframeStepHeader />
 
               <Stack
                 gap="md"
