@@ -78,10 +78,6 @@ const AuthenticationSection = () => {
           {t`Authentication`}
         </Text>
 
-        <Text size="sm" c="text-medium">
-          {t`Choose the authentication method for embedding:`}
-        </Text>
-
         <Radio.Group value={authType} onChange={handleAuthTypeChange}>
           <Stack gap="sm">
             {isQuestionOrDashboardEmbed && (
