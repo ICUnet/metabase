@@ -5,14 +5,14 @@ import {
   SettingsSection,
 } from "metabase/admin/components/SettingsSection";
 
+import { CorsInputWidget } from "./CorsInputWidget";
 import { SameSiteSelectWidget } from "./SameSiteSelectWidget";
-import { SdkCorsInputWidget } from "./SdkCorsInputWidget";
 
 export function EmbeddingSecuritySettings() {
   return (
     <SettingsPageWrapper title={t`Security`}>
       <SettingsSection>
-        <SdkCorsInputWidget />
+        <CorsInputWidget />
       </SettingsSection>
 
       <SettingsSection>
