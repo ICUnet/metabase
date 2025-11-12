@@ -2,6 +2,7 @@ import { t } from "ttag";
 
 import { useUpdateSettingsMutation } from "metabase/api";
 import { CodeEditor } from "metabase/common/components/CodeEditor";
+import { MoreServerSnippetExamplesLink } from "metabase/embedding/components/MoreServerSnippetExamplesLink/MoreServerSnippetExamplesLink";
 import { EmbedServerSnippetLanguageSelect } from "metabase/public/components/EmbedServerSnippetLanguageSelect/EmbedServerSnippetLanguageSelect";
 import { Card, Flex, Stack, Text } from "metabase/ui";
 import { CopyCodeSnippetButton } from "metabase-enterprise/embedding_iframe_sdk_setup/components/CodeSnippet/CopyCodeSnippetButton";
@@ -82,6 +83,8 @@ export const GetCodeStep = () => {
             <CopyCodeSnippetButton
               snippet={serverSnippetData.serverSnippetOption.source}
             />
+
+            <MoreServerSnippetExamplesLink />
           </Stack>
         </Card>
       )}
