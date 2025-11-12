@@ -13,7 +13,7 @@ import {
 } from "metabase/ui";
 
 import S from "./EmbeddingSettings.module.css";
-import { EmbeddingToggle } from "./EmbeddingToggle";
+import { type EmbeddingSettingKey, EmbeddingToggle } from "./EmbeddingToggle";
 
 type LinkItem = { icon: IconName; title: string; href: string };
 
@@ -22,6 +22,7 @@ export function EmbeddingSettingsCard({
   title,
   description,
   settingKey,
+  dependentSettingKeys,
   isFeatureEnabled = true,
   links,
   rightSideContent,
@@ -31,11 +32,8 @@ export function EmbeddingSettingsCard({
 }: PropsWithChildren<{
   title: string;
   description: string;
-  settingKey:
-    | "enable-embedding-sdk"
-    | "enable-embedding-simple"
-    | "enable-embedding-static"
-    | "enable-embedding-interactive";
+  settingKey: EmbeddingSettingKey;
+  dependentSettingKeys?: EmbeddingSettingKey[];
   isFeatureEnabled?: boolean;
   links?: LinkItem[];
   rightSideContent?: React.ReactNode;
@@ -59,6 +57,7 @@ export function EmbeddingSettingsCard({
         <Group justify="space-between" align="center">
           <EmbeddingToggle
             settingKey={settingKey}
+            dependentSettingKeys={dependentSettingKeys}
             labelPosition="right"
             disabled={!isFeatureEnabled}
             aria-label={`${title} toggle`}
