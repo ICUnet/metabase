@@ -234,7 +234,7 @@ function EmbeddingSettingsEE() {
 }
 
 function EmbeddingSettingsOSS() {
-  return <SharedStaticEmbeddingSettings />;
+  return <SharedStaticEmbeddingSettings showContentTranslationSettings />;
 }
 
 export const EmbeddingSettings = () => {

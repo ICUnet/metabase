@@ -1,12 +1,16 @@
+import { useMemo } from "react";
 import { t } from "ttag";
 
 import { SettingsSection } from "metabase/admin/components/SettingsSection";
 import { EmbeddingSettingsCard } from "metabase/admin/settings/components/EmbeddingSettings";
+import type { EmbeddingSettingKey } from "metabase/admin/settings/components/EmbeddingSettings/EmbeddingToggle";
 import { UpsellBanner } from "metabase/admin/upsells/components";
 import { useSetting } from "metabase/common/hooks";
 import { useSelector } from "metabase/lib/redux";
-import { isEEBuild } from "metabase/lib/utils";
-import { PLUGIN_CONTENT_TRANSLATION } from "metabase/plugins";
+import {
+  PLUGIN_CONTENT_TRANSLATION,
+  PLUGIN_EMBEDDING_IFRAME_SDK_SETUP,
+} from "metabase/plugins";
 import { getUpgradeUrl } from "metabase/selectors/settings";
 import { Box, Text } from "metabase/ui";
 
@@ -14,12 +18,25 @@ import { SettingTitle } from "../../SettingHeader";
 import { EmbeddedResources } from "../../widgets/PublicLinksListing/EmbeddedResources";
 import { EmbeddingSecretKeyWidget } from "../EmbeddingSecretKeyWidget";
 
-export function SharedStaticEmbeddingSettings() {
-  const isEE = isEEBuild();
+type Props = {
+  showContentTranslationSettings?: boolean;
+};
+
+export function SharedStaticEmbeddingSettings({
+  showContentTranslationSettings,
+}: Props) {
+  const isSimpleEmbedFeatureAvailable =
+    PLUGIN_EMBEDDING_IFRAME_SDK_SETUP.isFeatureEnabled();
   const isStaticEmbeddingEnabled = useSetting("enable-embedding-static");
 
   const upgradeUrl = useSelector((state) =>
     getUpgradeUrl(state, { utm_content: "admin_permissions" }),
+  );
+
+  const dependentSettingKeys: EmbeddingSettingKey[] = useMemo(
+    // When the simple embed feature is not available (oss), we toggle both static and simple embedding
+    () => (isSimpleEmbedFeatureAvailable ? [] : ["enable-embedding-simple"]),
+    [isSimpleEmbedFeatureAvailable],
   );
 
   return (
@@ -28,10 +45,10 @@ export function SharedStaticEmbeddingSettings() {
         title={t`Enable unauthenticated embeds`}
         description={t`A secure way to embed charts and dashboards when you don’t want to offer ad-hoc querying or chart drill-through.`}
         settingKey="enable-embedding-static"
-        dependentSettingKeys={["enable-embedding-simple"]}
+        dependentSettingKeys={dependentSettingKeys}
       />
 
-      {!isEE && (
+      {!isSimpleEmbedFeatureAvailable && (
         <UpsellBanner
           title={t`Upgrade to Metabase Pro for more powerful embedding methods`}
           campaign="embedded-analytics-js"
@@ -64,7 +81,9 @@ export function SharedStaticEmbeddingSettings() {
         </SettingsSection>
       )}
 
-      {!isEE && <PLUGIN_CONTENT_TRANSLATION.ContentTranslationConfiguration />}
+      {showContentTranslationSettings && (
+        <PLUGIN_CONTENT_TRANSLATION.ContentTranslationConfiguration />
+      )}
     </>
   );
 }

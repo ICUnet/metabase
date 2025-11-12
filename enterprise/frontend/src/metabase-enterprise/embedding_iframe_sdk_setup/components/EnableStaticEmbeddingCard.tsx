@@ -20,6 +20,10 @@ export const EnableStaticEmbeddingCard = () => {
     try {
       await updateSettings({
         "enable-embedding-static": true,
+        // When the simple embed feature is not available (oss), we toggle both static and simple embedding
+        ...(!isSimpleEmbedFeatureAvailable && {
+          "enable-embedding-simple": true,
+        }),
       });
     } catch (error) {
       sendToast({ message: t`Failed to enable unauthenticated embedding` });
