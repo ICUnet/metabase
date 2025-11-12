@@ -15,10 +15,13 @@ import {
 import { getSdkStore, useSdkSelector } from "embedding-sdk-bundle/store";
 import { getLoginStatus } from "embedding-sdk-bundle/store/selectors";
 import type { MetabaseAuthConfig } from "embedding-sdk-package";
+import { EmbeddingFooter } from "metabase/embedding/components/EmbeddingFooter/EmbeddingFooter";
 import { EMBEDDING_SDK_IFRAME_EMBEDDING_CONFIG } from "metabase/embedding-sdk/config";
 import { createTracker } from "metabase/lib/analytics-untyped";
+import { useSelector } from "metabase/lib/redux";
 import { PLUGIN_EMBEDDING_IFRAME_SDK } from "metabase/plugins";
-import { Box } from "metabase/ui";
+import { getSetting } from "metabase/selectors/settings";
+import { Box, Stack } from "metabase/ui";
 
 import { useParamRerenderKey } from "../hooks/use-param-rerender-key";
 import { useSdkIframeEmbedEventBus } from "../hooks/use-sdk-iframe-embed-event-bus";
@@ -86,9 +89,13 @@ export const SdkIframeEmbedRoute = () => {
       reduxStore={store}
       isLocalHost={embedSettings._isLocalhost}
     >
-      <Box h="100vh" bg={theme?.colors?.background}>
-        <SdkIframeEmbedView settings={embedSettings} />
-      </Box>
+      <Stack mih="100vh" bg={theme?.colors?.background}>
+        <Box style={{ flexGrow: 1, minHeight: 0 }}>
+          <SdkIframeEmbedView settings={embedSettings} />
+        </Box>
+
+        {isStatic && <EmbedBrandingFooter />}
+      </Stack>
     </ComponentProvider>
   );
 };
@@ -227,5 +234,21 @@ const SdkIframeEmbedView = ({
         ),
       )
       .otherwise(() => null)
+  );
+};
+
+const EmbedBrandingFooter = () => {
+  const hasEmbedBranding = useSelector(
+    (state) => !getSetting(state, "hide-embed-branding?"),
+  );
+
+  if (!hasEmbedBranding) {
+    return null;
+  }
+
+  return (
+    <PublicComponentStylesWrapper>
+      <EmbeddingFooter variant="default" hasEmbedBranding />
+    </PublicComponentStylesWrapper>
   );
 };
