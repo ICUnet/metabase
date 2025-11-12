@@ -6,7 +6,7 @@
   background-color: color-mix(
     in srgb,
     var(--mb-color-background-inverse) 5%,
-    transparent
+    var(--mb-color-bg-white)
   );
   border: 1px solid transparent;
   transition:
@@ -17,7 +17,7 @@
     background-color: color-mix(
       in srgb,
       var(--mb-color-background-inverse) 7%,
-      transparent
+      var(--mb-color-bg-white)
     );
   }
 
@@ -48,7 +48,7 @@
 }
 
 .handle {
-  cursor: pointer;
+  cursor: grab;
   height: 1rem;
   position: absolute;
   top: 0;
@@ -56,6 +56,10 @@
 
   &:focus-visible {
     outline: none !important;
+  }
+
+  &:active {
+    cursor: grabbing;
   }
 }
 
