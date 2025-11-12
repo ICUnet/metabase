@@ -2,7 +2,6 @@ import cx from "classnames";
 import { c, t } from "ttag";
 
 import { EmbeddingSettingsCard } from "metabase/admin/settings/components/EmbeddingSettings";
-import { SameSiteSelectWidget } from "metabase/admin/settings/components/EmbeddingSettings/EmbeddingSecuritySettings/SameSiteSelectWidget";
 import ExternalLink from "metabase/common/components/ExternalLink";
 import { useDocsUrl, useSetting } from "metabase/common/hooks";
 import CS from "metabase/css/core/index.css";
@@ -49,8 +48,6 @@ export function InteractiveEmbeddingSettingsCard() {
       {isInteractiveEmbeddingEnabled && (
         <Stack gap="xl" px="xl" pb="lg">
           <InteractiveEmbeddingAuthorizedOriginsWidget />
-
-          <SameSiteSelectWidget />
         </Stack>
       )}
     </EmbeddingSettingsCard>
