@@ -3,7 +3,8 @@ import { t } from "ttag";
 import { useUpdateSettingsMutation } from "metabase/api";
 import { CodeEditor } from "metabase/common/components/CodeEditor";
 import { EmbedServerSnippetLanguageSelect } from "metabase/public/components/EmbedServerSnippetLanguageSelect/EmbedServerSnippetLanguageSelect";
-import { Button, Card, CopyButton, Flex, Icon, Stack, Text } from "metabase/ui";
+import { Card, Flex, Stack, Text } from "metabase/ui";
+import { CopyCodeSnippetButton } from "metabase-enterprise/embedding_iframe_sdk_setup/components/CodeSnippet/CopyCodeSnippetButton";
 import { useSdkIframeEmbedServerSnippet } from "metabase-enterprise/embedding_iframe_sdk_setup/hooks/use-sdk-iframe-embed-server-snippet";
 import type { SettingKey } from "metabase-types/api";
 
@@ -34,6 +35,28 @@ export const GetCodeStep = () => {
 
   return (
     <Stack gap="md">
+      <Card p="md">
+        <Text size="lg" fw="bold" mb="md">
+          {t`Embed code`}
+        </Text>
+
+        <Stack gap="sm">
+          <div onCopy={handleCodeSnippetCopied}>
+            <CodeEditor
+              language="html"
+              value={snippet}
+              readOnly
+              lineNumbers={false}
+            />
+          </div>
+
+          <CopyCodeSnippetButton
+            snippet={snippet}
+            onCopy={handleCodeSnippetCopied}
+          />
+        </Stack>
+      </Card>
+
       {!!serverSnippetData && (
         <Card p="md">
           <Flex align="baseline" justify="space-between">
@@ -55,40 +78,13 @@ export const GetCodeStep = () => {
               readOnly
               lineNumbers={false}
             />
+
+            <CopyCodeSnippetButton
+              snippet={serverSnippetData.serverSnippetOption.source}
+            />
           </Stack>
         </Card>
       )}
-
-      <Card p="md">
-        <Text size="lg" fw="bold" mb="md">
-          {t`Embed code`}
-        </Text>
-
-        <Stack gap="sm">
-          <div onCopy={handleCodeSnippetCopied}>
-            <CodeEditor
-              language="html"
-              value={snippet}
-              readOnly
-              lineNumbers={false}
-            />
-          </div>
-
-          <CopyButton value={snippet}>
-            {({ copied, copy }: { copied: boolean; copy: () => void }) => (
-              <Button
-                leftSection={<Icon name="copy" size={16} />}
-                onClick={() => {
-                  copy();
-                  handleCodeSnippetCopied();
-                }}
-              >
-                {copied ? t`Copied!` : t`Copy code`}
-              </Button>
-            )}
-          </CopyButton>
-        </Stack>
-      </Card>
     </Stack>
   );
 };
