@@ -21,7 +21,7 @@ import { createTracker } from "metabase/lib/analytics-untyped";
 import { useSelector } from "metabase/lib/redux";
 import { PLUGIN_EMBEDDING_IFRAME_SDK } from "metabase/plugins";
 import { getSetting } from "metabase/selectors/settings";
-import { Box, Stack } from "metabase/ui";
+import { Stack } from "metabase/ui";
 
 import { useParamRerenderKey } from "../hooks/use-param-rerender-key";
 import { useSdkIframeEmbedEventBus } from "../hooks/use-sdk-iframe-embed-event-bus";
@@ -89,10 +89,18 @@ export const SdkIframeEmbedRoute = () => {
       reduxStore={store}
       isLocalHost={embedSettings._isLocalhost}
     >
-      <Stack mih="100vh" bg={theme?.colors?.background}>
-        <Box style={{ flexGrow: 1, minHeight: 0 }}>
-          <SdkIframeEmbedView settings={embedSettings} />
-        </Box>
+      {" "}
+      <Stack
+        mih="100vh"
+        bg={theme?.colors?.background}
+        style={{
+          display: "grid",
+          width: "100%",
+          gridTemplateColumns: "1fr",
+          gridTemplateRows: "1fr auto",
+        }}
+      >
+        <SdkIframeEmbedView settings={embedSettings} />
 
         {isStatic && <EmbedBrandingFooter />}
       </Stack>
