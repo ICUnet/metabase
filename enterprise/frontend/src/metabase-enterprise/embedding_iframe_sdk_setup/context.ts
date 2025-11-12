@@ -16,8 +16,8 @@ import type {
 } from "./types";
 
 export interface SdkIframeEmbedSetupContextType {
-  // Edition
-  isEE: boolean;
+  // User features
+  isSimpleEmbedFeatureAvailable: boolean;
 
   // User settings
   isSimpleEmbeddingEnabled: boolean;

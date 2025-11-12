@@ -5,7 +5,7 @@ import _ from "underscore";
 import { PLUGIN_METABOT } from "metabase/plugins";
 import { Card, Radio, Stack, Text } from "metabase/ui";
 import { ALLOWED_EMBED_SETTING_KEYS_MAP } from "metabase-enterprise/embedding_iframe_sdk/constants";
-import { WithNotAvailableForOssUpsellTooltip } from "metabase-enterprise/embedding_iframe_sdk_setup/components/warnings/WithNotAvailableForOssUpsellTooltip";
+import { WithSimpleEmbeddingFeatureUpsellTooltip } from "metabase-enterprise/embedding_iframe_sdk_setup/components/warnings/WithSimpleEmbeddingFeatureUpsellTooltip";
 
 import {
   EMBED_FALLBACK_DASHBOARD_ID,
@@ -18,7 +18,7 @@ import { getDefaultSdkIframeEmbedSettings } from "../utils/get-default-sdk-ifram
 
 export const SelectEmbedExperienceStep = () => {
   const {
-    isEE,
+    isSimpleEmbedFeatureAvailable,
     isStaticEmbeddingEnabled,
     initialState,
     experience,
@@ -63,7 +63,10 @@ export const SelectEmbedExperienceStep = () => {
     });
   };
 
-  const experiences = getEmbedExperiences({ isEE, isMetabotAvailable });
+  const experiences = getEmbedExperiences({
+    isSimpleEmbedFeatureAvailable,
+    isMetabotAvailable,
+  });
 
   return (
     <Card p="md" mb="md">
@@ -81,7 +84,7 @@ export const SelectEmbedExperienceStep = () => {
       >
         <Stack gap="md">
           {experiences.map((experience) => (
-            <WithNotAvailableForOssUpsellTooltip
+            <WithSimpleEmbeddingFeatureUpsellTooltip
               key={experience.value}
               shouldWrap={experience.showUpsell === true}
             >
@@ -93,7 +96,7 @@ export const SelectEmbedExperienceStep = () => {
                   disabled={disabled}
                 />
               )}
-            </WithNotAvailableForOssUpsellTooltip>
+            </WithSimpleEmbeddingFeatureUpsellTooltip>
           ))}
         </Stack>
       </Radio.Group>

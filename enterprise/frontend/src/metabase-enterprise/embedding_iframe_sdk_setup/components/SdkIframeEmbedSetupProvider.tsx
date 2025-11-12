@@ -2,8 +2,10 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 
 import { useSearchQuery } from "metabase/api";
 import { useSetting } from "metabase/common/hooks";
-import { isEEBuild } from "metabase/lib/utils";
-import type { SdkIframeEmbedSetupModalInitialState } from "metabase/plugins";
+import {
+  PLUGIN_EMBEDDING_IFRAME_SDK_SETUP,
+  type SdkIframeEmbedSetupModalInitialState,
+} from "metabase/plugins";
 import { useEmbeddingParameters } from "metabase-enterprise/embedding_iframe_sdk_setup/hooks/use-embedding-paramers";
 import { useGetStaticEmbeddingSignedToken } from "metabase-enterprise/embedding_iframe_sdk_setup/hooks/use-get-static-embedding-signed-token";
 
@@ -32,9 +34,10 @@ export const SdkIframeEmbedSetupProvider = ({
   initialState,
   onClose,
 }: SdkIframeEmbedSetupProviderProps) => {
-  const isEE = isEEBuild();
-
+  const isSimpleEmbedFeatureAvailable =
+    PLUGIN_EMBEDDING_IFRAME_SDK_SETUP.isFeatureEnabled();
   const isSimpleEmbeddingEnabled = useSetting("enable-embedding-simple");
+
   const isStaticEmbeddingEnabled = useSetting("enable-embedding-static");
 
   // We don't want to re-fetch the recent items every time we switch between
@@ -137,7 +140,7 @@ export const SdkIframeEmbedSetupProvider = ({
   ]);
 
   const value: SdkIframeEmbedSetupContextType = {
-    isEE,
+    isSimpleEmbedFeatureAvailable,
     isSimpleEmbeddingEnabled,
     isStaticEmbeddingEnabled,
     currentStep,

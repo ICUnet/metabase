@@ -9,7 +9,6 @@ import {
 } from "metabase/admin/components/RelatedSettingsSection";
 import { SettingsPageWrapper } from "metabase/admin/components/SettingsSection";
 import { UpsellDevInstances } from "metabase/admin/upsells";
-import { UpsellEmbeddingButton } from "metabase/admin/upsells/UpsellEmbeddingButton";
 import { UpsellSdkLink } from "metabase/admin/upsells/UpsellSdkLink";
 import ExternalLink from "metabase/common/components/ExternalLink";
 import { useDocsUrl, useSetting, useUrlWithUtm } from "metabase/common/hooks";
@@ -19,7 +18,6 @@ import { isEEBuild } from "metabase/lib/utils";
 import {
   PLUGIN_ADMIN_SETTINGS,
   PLUGIN_CONTENT_TRANSLATION,
-  PLUGIN_EMBEDDING_IFRAME_SDK_SETUP,
   PLUGIN_EMBEDDING_SDK,
   type SdkIframeEmbedSetupModalProps,
 } from "metabase/plugins";
@@ -53,17 +51,11 @@ function EmbeddingSettingsPageWrapper({ children }: PropsWithChildren) {
   );
 }
 
-function EmbeddingSettingsInternal() {
+function EmbeddingSettingsEE() {
   const dispatch = useDispatch();
   const isEE = isEEBuild();
 
   const isReactSdkFeatureAvailable = PLUGIN_EMBEDDING_SDK.isEnabled();
-
-  const isSimpleEmbedFeatureAvailable =
-    PLUGIN_EMBEDDING_IFRAME_SDK_SETUP.isFeatureEnabled();
-
-  const isEmbeddingAvailable =
-    isReactSdkFeatureAvailable || isSimpleEmbedFeatureAvailable;
 
   const isHosted = useSetting("is-hosted?");
 
@@ -109,10 +101,10 @@ function EmbeddingSettingsInternal() {
     </ExternalLink>
   );
 
-  const apiKeyBannerText = match({
+  const sdkApiKeyBannerText = match({
     needsToSwitchBinaries: !isEE,
-    needsToUpgrade: !isEmbeddingAvailable,
-    needsToImplementJwt: isEmbeddingAvailable,
+    needsToUpgrade: !isReactSdkFeatureAvailable,
+    needsToImplementJwt: isReactSdkFeatureAvailable,
   })
     .with(
       { needsToSwitchBinaries: true },
@@ -148,7 +140,6 @@ function EmbeddingSettingsInternal() {
         title={t`Enable Embedded Analytics JS`}
         description={t`An easy-to-use library that lets you embed Metabase entities like charts, dashboards, or even the query builder into your own application using customizable components.`}
         settingKey="enable-embedding-simple"
-        isFeatureEnabled={isSimpleEmbedFeatureAvailable}
         links={[
           {
             icon: "reference",
@@ -156,40 +147,28 @@ function EmbeddingSettingsInternal() {
             href: embedJsDocumentationUrl?.url,
           },
         ]}
-        rightSideContent={
-          !isSimpleEmbedFeatureAvailable ? (
-            <UpsellEmbeddingButton
-              url="https://www.metabase.com/product/embedded-analytics"
-              campaign="embedded-analytics-js"
-              location="embedding-page"
-              size="default"
-            />
-          ) : undefined
-        }
         actionButton={
-          isSimpleEmbedFeatureAvailable && (
-            <Button
-              variant="brand"
-              size="sm"
-              onClick={() => {
-                const modalProps: Pick<
-                  SdkIframeEmbedSetupModalProps,
-                  "initialState"
-                > = {
-                  initialState: {
-                    isStatic: true,
-                    useExistingUserSession: false,
-                  },
-                };
+          <Button
+            variant="brand"
+            size="sm"
+            onClick={() => {
+              const modalProps: Pick<
+                SdkIframeEmbedSetupModalProps,
+                "initialState"
+              > = {
+                initialState: {
+                  isStatic: true,
+                  useExistingUserSession: false,
+                },
+              };
 
-                dispatch(
-                  setOpenModalWithProps({ id: "embed", props: modalProps }),
-                );
-              }}
-            >
-              {t`New embed`}
-            </Button>
-          )
+              dispatch(
+                setOpenModalWithProps({ id: "embed", props: modalProps }),
+              );
+            }}
+          >
+            {t`New embed`}
+          </Button>
         }
         testId="sdk-setting-card"
       />
@@ -210,7 +189,7 @@ function EmbeddingSettingsInternal() {
             href: sdkDocumentationUrl,
           },
         ]}
-        alertInfoText={apiKeyBannerText}
+        alertInfoText={sdkApiKeyBannerText}
         testId="sdk-setting-card"
       />
 
@@ -224,7 +203,7 @@ function EmbeddingSettingsInternal() {
 
       <PLUGIN_CONTENT_TRANSLATION.ContentTranslationConfiguration />
 
-      {isEmbeddingAvailable && isHosted && (
+      {isReactSdkFeatureAvailable && isHosted && (
         <Box py="lg" px="xl" className={S.SectionCard}>
           <Stack gap="xs">
             <Text
@@ -254,12 +233,16 @@ function EmbeddingSettingsInternal() {
   );
 }
 
+function EmbeddingSettingsOSS() {
+  return <SharedStaticEmbeddingSettings />;
+}
+
 export const EmbeddingSettings = () => {
   const isEE = isEEBuild();
 
   return (
     <EmbeddingSettingsPageWrapper>
-      {isEE ? <EmbeddingSettingsInternal /> : <SharedStaticEmbeddingSettings />}
+      {isEE ? <EmbeddingSettingsEE /> : <EmbeddingSettingsOSS />}
     </EmbeddingSettingsPageWrapper>
   );
 };

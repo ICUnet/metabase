@@ -39,7 +39,7 @@ export const SdkIframeEmbedSetupContent = () => {
   const dispatch = useDispatch();
   const [updateSettings] = useUpdateSettingsMutation();
   const {
-    isEE,
+    isSimpleEmbedFeatureAvailable,
     isSimpleEmbeddingEnabled,
     isStaticEmbeddingEnabled,
     currentStep,
@@ -60,7 +60,7 @@ export const SdkIframeEmbedSetupContent = () => {
     dispatch(closeModal());
   }
 
-  const isEmbeddingEnabled = isEE
+  const allowPreviewAndNavigation = isSimpleEmbedFeatureAvailable
     ? isSimpleEmbeddingEnabled
     : isStaticEmbeddingEnabled;
 
@@ -77,7 +77,7 @@ export const SdkIframeEmbedSetupContent = () => {
     .with("select-embed-options", () => (
       <Button
         variant="filled"
-        disabled={!isEmbeddingEnabled}
+        disabled={!allowPreviewAndNavigation}
         onClick={handleNext}
       >
         {t`Get code`}
@@ -87,7 +87,7 @@ export const SdkIframeEmbedSetupContent = () => {
       <Button
         variant="filled"
         onClick={handleNext}
-        disabled={!isEmbeddingEnabled}
+        disabled={!allowPreviewAndNavigation}
       >
         {t`Next`}
       </Button>
@@ -99,7 +99,7 @@ export const SdkIframeEmbedSetupContent = () => {
         <Box className={S.Sidebar} component="aside">
           <Stack className={S.SidebarContent} gap="md">
             <Stack gap="md">
-              {isEE ? (
+              {isSimpleEmbedFeatureAvailable ? (
                 <EnableEmbeddedAnalyticsCard />
               ) : (
                 <EnableStaticEmbeddingCard />
@@ -107,8 +107,10 @@ export const SdkIframeEmbedSetupContent = () => {
 
               <Stack
                 gap="md"
-                opacity={isEmbeddingEnabled ? 1 : 0.5}
-                className={cx(!isEmbeddingEnabled && CS.pointerEventsNone)}
+                opacity={allowPreviewAndNavigation ? 1 : 0.5}
+                className={cx(
+                  !allowPreviewAndNavigation && CS.pointerEventsNone,
+                )}
               >
                 <StepContent />
               </Stack>
@@ -119,7 +121,7 @@ export const SdkIframeEmbedSetupContent = () => {
             <Button
               variant="default"
               onClick={handleBack}
-              disabled={!canGoBack || !isEmbeddingEnabled}
+              disabled={!canGoBack || !allowPreviewAndNavigation}
             >
               {t`Back`}
             </Button>
@@ -135,7 +137,7 @@ export const SdkIframeEmbedSetupContent = () => {
 
           <SdkIframeStaticEmbeddingStatusBar />
 
-          {isEmbeddingEnabled ? (
+          {allowPreviewAndNavigation ? (
             <SdkIframeEmbedPreview />
           ) : (
             <Card h="100%">

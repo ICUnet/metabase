@@ -23,7 +23,7 @@ import { LegacyStaticEmbeddingAlert } from "./LegacyStaticEmbeddingAlert";
 import { MetabotLayoutSetting } from "./MetabotLayoutSetting";
 import { ParameterSettings } from "./ParameterSettings";
 import { TooltipWarning } from "./warnings/TooltipWarning";
-import { WithNotAvailableForOssUpsellTooltip } from "./warnings/WithNotAvailableForOssUpsellTooltip";
+import { WithSimpleEmbeddingFeatureUpsellTooltip } from "./warnings/WithSimpleEmbeddingFeatureUpsellTooltip";
 
 export const SelectEmbedOptionsStep = () => (
   <Stack gap="md">
@@ -36,8 +36,12 @@ export const SelectEmbedOptionsStep = () => (
 );
 
 const AuthenticationSection = () => {
-  const { isEE, experience, settings, updateSettings } =
-    useSdkIframeEmbedSetupContext();
+  const {
+    isSimpleEmbedFeatureAvailable,
+    experience,
+    settings,
+    updateSettings,
+  } = useSdkIframeEmbedSetupContext();
 
   const isStaticEmbedding = !!settings.isStatic;
   const isQuestionOrDashboardEmbed =
@@ -81,7 +85,7 @@ const AuthenticationSection = () => {
         <Radio.Group value={authType} onChange={handleAuthTypeChange}>
           <Stack gap="sm">
             {isQuestionOrDashboardEmbed && (
-              <WithStaticIsDisabledWarning>
+              <WithStaticEmbeddingDisabledWarning>
                 {({ disabled }) => (
                   <Radio
                     disabled={disabled}
@@ -89,10 +93,12 @@ const AuthenticationSection = () => {
                     label={t`Unauthenticated`}
                   />
                 )}
-              </WithStaticIsDisabledWarning>
+              </WithStaticEmbeddingDisabledWarning>
             )}
 
-            <WithNotAvailableForOssUpsellTooltip shouldWrap={!isEE}>
+            <WithSimpleEmbeddingFeatureUpsellTooltip
+              shouldWrap={!isSimpleEmbedFeatureAvailable}
+            >
               {({ disabled }) => (
                 <Radio
                   value="user-session"
@@ -125,9 +131,11 @@ const AuthenticationSection = () => {
                   disabled={disabled}
                 />
               )}
-            </WithNotAvailableForOssUpsellTooltip>
+            </WithSimpleEmbeddingFeatureUpsellTooltip>
 
-            <WithNotAvailableForOssUpsellTooltip shouldWrap={!isEE}>
+            <WithSimpleEmbeddingFeatureUpsellTooltip
+              shouldWrap={!isSimpleEmbedFeatureAvailable}
+            >
               {({ disabled }) => (
                 <Radio
                   value="sso"
@@ -135,7 +143,7 @@ const AuthenticationSection = () => {
                   disabled={disabled || !isSsoEnabledAndConfigured}
                 />
               )}
-            </WithNotAvailableForOssUpsellTooltip>
+            </WithSimpleEmbeddingFeatureUpsellTooltip>
           </Stack>
         </Radio.Group>
 
@@ -333,7 +341,7 @@ const AppearanceSection = () => {
   );
 };
 
-const WithStaticIsDisabledWarning = ({
+const WithStaticEmbeddingDisabledWarning = ({
   children,
 }: {
   children: (data: { disabled: boolean }) => ReactNode;
@@ -361,10 +369,13 @@ const WithNotAvailableForStaticEmbeddingWarning = ({
 }: {
   children: (data: { disabled: boolean }) => ReactNode;
 }) => {
-  const { isEE, settings } = useSdkIframeEmbedSetupContext();
+  const { isSimpleEmbedFeatureAvailable, settings } =
+    useSdkIframeEmbedSetupContext();
 
   return (
-    <WithNotAvailableForOssUpsellTooltip shouldWrap={!isEE}>
+    <WithSimpleEmbeddingFeatureUpsellTooltip
+      shouldWrap={!isSimpleEmbedFeatureAvailable}
+    >
       {({ disabled: disabledForOss }) => (
         <TooltipWarning
           shouldWrap={!disabledForOss}
@@ -382,6 +393,6 @@ const WithNotAvailableForStaticEmbeddingWarning = ({
           }
         </TooltipWarning>
       )}
-    </WithNotAvailableForOssUpsellTooltip>
+    </WithSimpleEmbeddingFeatureUpsellTooltip>
   );
 };

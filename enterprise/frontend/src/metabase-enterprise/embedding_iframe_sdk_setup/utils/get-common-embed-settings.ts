@@ -1,4 +1,4 @@
-import { isEEBuild } from "metabase/lib/utils";
+import { PLUGIN_EMBEDDING_IFRAME_SDK_SETUP } from "metabase/plugins";
 
 import type {
   SdkIframeDashboardEmbedSettings,
@@ -70,7 +70,10 @@ export const getCommonEmbedSettings = ({
   experience: SdkIframeEmbedSetupExperience;
   isStaticEmbeddingEnabled: boolean;
 }) => {
-  if (isEEBuild()) {
+  const isSimpleEmbedFeatureAvailable =
+    PLUGIN_EMBEDDING_IFRAME_SDK_SETUP.isFeatureEnabled();
+
+  if (isSimpleEmbedFeatureAvailable) {
     return isStaticEmbeddingEnabled && state?.isStatic
       ? GET_ENABLE_STATIC_EMBEDDING_SETTINGS({ experience })
       : GET_DISABLE_STATIC_EMBEDDING_SETTINGS({ state, experience });

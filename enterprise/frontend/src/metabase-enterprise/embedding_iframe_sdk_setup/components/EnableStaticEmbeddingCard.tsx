@@ -7,7 +7,8 @@ import { Button, Card, Group, Icon, Stack, Text } from "metabase/ui";
 import { useSdkIframeEmbedSetupContext } from "metabase-enterprise/embedding_iframe_sdk_setup/context";
 
 export const EnableStaticEmbeddingCard = () => {
-  const { isEE, isStaticEmbeddingEnabled } = useSdkIframeEmbedSetupContext();
+  const { isSimpleEmbedFeatureAvailable, isStaticEmbeddingEnabled } =
+    useSdkIframeEmbedSetupContext();
   const [updateSettings] = useUpdateSettingsMutation();
   const [sendToast] = useToast();
 
@@ -25,7 +26,7 @@ export const EnableStaticEmbeddingCard = () => {
     }
   };
 
-  if (isEE || !showStaticEmbedding) {
+  if (isSimpleEmbedFeatureAvailable || !showStaticEmbedding) {
     return null;
   }
 

@@ -11,7 +11,7 @@ import { TooltipWarning } from "./TooltipWarning";
 
 const UPSELL_CARD_WIDTH = 252;
 
-export const WithNotAvailableForOssUpsellTooltip = ({
+export const WithSimpleEmbeddingFeatureUpsellTooltip = ({
   children,
   shouldWrap,
 }: {

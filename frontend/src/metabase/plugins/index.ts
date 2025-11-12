@@ -622,7 +622,6 @@ export type SdkIframeEmbedSetupModalInitialState = {
 
 export const PLUGIN_EMBEDDING_IFRAME_SDK_SETUP = {
   isFeatureEnabled: () => false,
-  shouldShowEmbedInNewItemMenu: () => false,
 };
 
 export const PLUGIN_CONTENT_VERIFICATION = {
