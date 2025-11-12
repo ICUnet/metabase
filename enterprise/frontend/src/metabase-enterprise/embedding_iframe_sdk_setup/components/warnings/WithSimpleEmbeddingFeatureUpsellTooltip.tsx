@@ -7,15 +7,17 @@ import { useSelector } from "metabase/lib/redux";
 import { getUpgradeUrl } from "metabase/selectors/settings";
 import { useSdkIframeEmbedSetupContext } from "metabase-enterprise/embedding_iframe_sdk_setup/context";
 
-import { TooltipWarning } from "./TooltipWarning";
+import { TooltipWarning, type TooltipWarningMode } from "./TooltipWarning";
 
 const UPSELL_CARD_WIDTH = 252;
 
 export const WithSimpleEmbeddingFeatureUpsellTooltip = ({
+  mode,
   children,
   shouldWrap,
 }: {
-  children: (data: { disabled: boolean }) => ReactNode;
+  mode?: TooltipWarningMode;
+  children: (data: { disabled: boolean; hoverCard: ReactNode }) => ReactNode;
   shouldWrap: boolean;
 }) => {
   const { settings } = useSdkIframeEmbedSetupContext();
@@ -28,6 +30,7 @@ export const WithSimpleEmbeddingFeatureUpsellTooltip = ({
 
   return (
     <TooltipWarning
+      mode={mode}
       shouldWrap={shouldWrap}
       icon={<UpsellGem />}
       warning={

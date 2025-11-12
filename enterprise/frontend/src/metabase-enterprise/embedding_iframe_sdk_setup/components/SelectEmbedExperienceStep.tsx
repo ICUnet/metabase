@@ -3,7 +3,7 @@ import { t } from "ttag";
 import _ from "underscore";
 
 import { PLUGIN_METABOT } from "metabase/plugins";
-import { Card, Radio, Stack, Text } from "metabase/ui";
+import { Card, Flex, Radio, Stack, Text } from "metabase/ui";
 import { ALLOWED_EMBED_SETTING_KEYS_MAP } from "metabase-enterprise/embedding_iframe_sdk/constants";
 import { WithSimpleEmbeddingFeatureUpsellTooltip } from "metabase-enterprise/embedding_iframe_sdk_setup/components/warnings/WithSimpleEmbeddingFeatureUpsellTooltip";
 
@@ -86,12 +86,18 @@ export const SelectEmbedExperienceStep = () => {
           {experiences.map((experience) => (
             <WithSimpleEmbeddingFeatureUpsellTooltip
               key={experience.value}
+              mode="custom"
               shouldWrap={experience.showUpsell === true}
             >
-              {({ disabled }) => (
+              {({ disabled, hoverCard }) => (
                 <Radio
                   value={experience.value}
-                  label={experience.title}
+                  label={
+                    <Flex gap="xs" align="center">
+                      {experience.title}
+                      {hoverCard}
+                    </Flex>
+                  }
                   description={experience.description}
                   disabled={disabled}
                 />
