@@ -53,11 +53,12 @@ export const SdkIframeEmbedRoute = () => {
 
   const hasEmbedTokenFeature = PLUGIN_EMBEDDING_IFRAME_SDK.hasValidLicense();
 
+  const { isStatic, theme, locale } = embedSettings;
   const isProduction = !embedSettings._isLocalhost;
 
-  // If the parent page is not running on localhost and
+  // If the parent page is not running on localhost, it's not the unauthenticated embedding, and
   // the token feature is not present, we show an error message
-  if (isProduction && !hasEmbedTokenFeature) {
+  if (isProduction && !isStatic && !hasEmbedTokenFeature) {
     return <SdkIframeInvalidLicenseError />;
   }
 
@@ -70,8 +71,6 @@ export const SdkIframeEmbedRoute = () => {
   if (isProduction && embedSettings.useExistingUserSession) {
     return <SdkIframeExistingUserSessionInProductionError />;
   }
-
-  const { isStatic, theme, locale } = embedSettings;
 
   const authConfig = {
     metabaseInstanceUrl: embedSettings.instanceUrl,
