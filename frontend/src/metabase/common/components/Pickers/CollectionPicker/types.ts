@@ -58,6 +58,7 @@ export type CollectionPickerOptions = EntityPickerModalOptions & {
   allowCreateNew?: boolean;
   showPersonalCollections?: boolean;
   showRootCollection?: boolean;
+  showLibrary?: boolean;
 };
 
 export type CollectionItemListProps = ListProps<

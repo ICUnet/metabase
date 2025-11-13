@@ -71,6 +71,10 @@ export const getIconBase = (item: ObjectWithModel): IconData => {
     return { name: "person" };
   }
 
+  if (item.model === "collection" && item.id === "databases") {
+    return { name: "database" };
+  }
+
   switch (PLUGIN_SEMANTIC_LAYER.getSemanticLayerCollectionType(item)) {
     case "semantic-layer":
       return { name: "repository" };
