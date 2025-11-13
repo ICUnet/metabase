@@ -65,7 +65,7 @@
                                  (personal-ids first-parent-collection-id)))]
     (remove personal-descendant? collections)))
 
-(defn- select-collections
+(defn select-collections
   "Select collections based off certain parameters. If `shallow` is true, we select only the requested collection (or
   the root, if `collection-id` is `nil`) and its immediate children, to avoid reading the entire collection tree when it
   is not necessary.
@@ -943,7 +943,7 @@
       res
       limit-res)))
 
-(mu/defn- collection-children
+(mu/defn collection-children
   "Fetch a sequence of 'child' objects belonging to a Collection, filtered using `options`."
   [{collection-namespace :namespace, :as collection} :- collection/CollectionWithLocationAndIDOrRoot
    {:keys [models], :as options}                     :- CollectionChildrenOptions]

@@ -86,6 +86,25 @@
                    dashboard)))
           dashboards)))
 
+(api.macros/defendpoint :get "/readable"
+  "Return all dashboards that a given user (passed as `user_id` in query params) can read."
+  [_route-params
+   {:keys [user_id]} :- [:map
+                         [:user_id ms/PositiveInt]]]
+  (api/check-superuser)
+  (request/with-current-user user_id
+    (let [collections (api.collection/select-collections
+                       {:archived false
+                        :exclude-other-user-collections false})]
+      (->> collections
+           (map #(-> (api.collection/collection-children %
+                                                         {:show-dashboard-questions? false
+                                                          :archived? false
+                                                          :models #{:dashboard}})
+                     :data))
+           (apply concat)
+           (into [])))))
+
 (defn- hydrate-dashboard-details
   "Get dashboard details for the complete dashboard, including tabs, dashcards, params, etc."
   [{dashboard-id :id :as dashboard}]
