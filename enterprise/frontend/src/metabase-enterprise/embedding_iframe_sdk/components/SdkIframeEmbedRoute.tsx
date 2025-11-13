@@ -89,7 +89,6 @@ export const SdkIframeEmbedRoute = () => {
       reduxStore={store}
       isLocalHost={embedSettings._isLocalhost}
     >
-      {" "}
       <Stack
         mih="100vh"
         bg={theme?.colors?.background}

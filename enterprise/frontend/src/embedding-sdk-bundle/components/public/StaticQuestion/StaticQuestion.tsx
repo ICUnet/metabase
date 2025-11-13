@@ -1,3 +1,4 @@
+import cx from "classnames";
 import type { PropsWithChildren } from "react";
 
 import { FlexibleSizeComponent } from "embedding-sdk-bundle/components/private/FlexibleSizeComponent";
@@ -22,6 +23,7 @@ import {
 import { ResultToolbar } from "embedding-sdk-bundle/components/private/SdkQuestion/components/ResultToolbar/ResultToolbar";
 import type { SdkQuestionEntityProps } from "embedding-sdk-bundle/components/private/SdkQuestion/context";
 import { DefaultViewTitle } from "embedding-sdk-bundle/components/private/SdkQuestionDefaultView/DefaultViewTitle";
+import InteractiveQuestionS from "embedding-sdk-bundle/components/private/SdkQuestionDefaultView/SdkQuestionDefaultView.module.css";
 import {
   SdkQuestion,
   type SdkQuestionProps,
@@ -120,34 +122,45 @@ const StaticQuestionInner = ({
       withDownloads={withDownloads}
     >
       {children ?? (
-        <FlexibleSizeComponent
-          width={width}
-          height={height}
-          className={className}
-          style={style}
-        >
-          <Stack gap="sm" w="100%" h="100%">
-            {title && <DefaultViewTitle title={title} />}
+        <FlexibleSizeComponent width={width} height={height} style={style}>
+          <Stack
+            className={cx(InteractiveQuestionS.Container, className)}
+            gap="sm"
+            w="100%"
+            h="100%"
+          >
+            <Stack className={InteractiveQuestionS.TopBar} gap="sm" p="md">
+              {title && <DefaultViewTitle title={title} />}
 
-            {(withChartTypeSelector || withDownloads) && (
-              <ResultToolbar>
-                {withChartTypeSelector && <SdkQuestion.ChartTypeDropdown />}
-                {withDownloads && <SdkQuestion.DownloadWidgetDropdown />}
-              </ResultToolbar>
-            )}
+              {(withChartTypeSelector || withDownloads) && (
+                <ResultToolbar>
+                  {withChartTypeSelector && <SdkQuestion.ChartTypeDropdown />}
+                  {withDownloads && <SdkQuestion.DownloadWidgetDropdown />}
+                </ResultToolbar>
+              )}
 
-            {isStaticEmbedding && (
-              <Box w="100%">
-                <SdkQuestion.SqlParametersList />
+              {isStaticEmbedding && (
+                <Box w="100%">
+                  <SdkQuestion.SqlParametersList />
+                </Box>
+              )}
+            </Stack>
+
+            <Box
+              className={cx(InteractiveQuestionS.Main, "sdk-question-main")}
+              p="sm"
+              w="100%"
+              h="100%"
+            >
+              <Box className={InteractiveQuestionS.Content}>
+                <SdkQuestion.QuestionVisualization
+                  height={height}
+                  width={width}
+                  className={className}
+                  style={style}
+                />
               </Box>
-            )}
-
-            <SdkQuestion.QuestionVisualization
-              height={height}
-              width={width}
-              className={className}
-              style={style}
-            />
+            </Box>
           </Stack>
         </FlexibleSizeComponent>
       )}
