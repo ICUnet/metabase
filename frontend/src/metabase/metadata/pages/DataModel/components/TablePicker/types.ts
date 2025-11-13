@@ -2,7 +2,10 @@ import type {
   DatabaseId,
   SchemaName,
   Table,
+  TableDataLayer,
+  TableDataSource,
   TableId,
+  UserId,
 } from "metabase-types/api";
 
 export type NodeKey = string;
@@ -59,13 +62,24 @@ export type ItemType = Item["type"];
 
 export type FlatItem = LoadingItem | ExpandedItem;
 
-type ExpandedItem = Item & {
+interface ExpandedItemBase {
   isExpanded?: boolean;
   isLoading?: false;
   parent?: NodeKey;
   level: number;
   disabled?: boolean;
-};
+  isSelected?: "yes" | "no" | "some";
+  children: TreeNode[];
+}
+
+export type ExpandedItem = Item & ExpandedItemBase;
+
+export type ExpandedSchemaItem = SchemaItem &
+  ExpandedItemBase & {
+    children: TableNode[];
+  };
+
+export type ExpandedTableItem = TableItem & ExpandedItemBase;
 
 type LoadingItem = {
   isLoading: true;
@@ -78,6 +92,7 @@ type LoadingItem = {
   parent?: NodeKey;
   table?: undefined;
   disabled?: never;
+  children: [];
 };
 
 export type ExpandedState = {
@@ -86,4 +101,34 @@ export type ExpandedState = {
 
 export interface ChangeOptions {
   isAutomatic?: boolean;
+}
+
+export interface FilterState {
+  dataLayer: TableDataLayer | null;
+  dataSource: TableDataSource | "unknown" | null;
+  ownerEmail: string | null;
+  ownerUserId: UserId | "unknown" | null;
+  orphansOnly: boolean | null;
+}
+
+export function isExpandedItem(node: FlatItem): node is ExpandedItem {
+  return node.isLoading === undefined;
+}
+
+export function isSchemaNode(
+  node: ExpandedItem | TreeNode,
+): node is ExpandedSchemaItem {
+  return (
+    node.type === "schema" &&
+    node.children.every((child) => child.type === "table")
+  );
+}
+
+export function isTableNode(
+  node: ExpandedItem | TreeNode,
+): node is ExpandedTableItem {
+  return (
+    node.type === "schema" &&
+    node.children.every((child) => child.type === "table")
+  );
 }

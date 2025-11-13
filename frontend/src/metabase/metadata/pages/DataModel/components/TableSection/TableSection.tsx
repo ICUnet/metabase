@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useContext, useState } from "react";
 import { Link } from "react-router";
 import { t } from "ttag";
 
@@ -7,16 +7,16 @@ import {
   useUpdateTableMutation,
 } from "metabase/api";
 import EmptyState from "metabase/common/components/EmptyState";
-import * as Urls from "metabase/lib/urls";
+import { dependencyGraph } from "metabase/lib/urls/dependencies";
 import {
   FieldOrderPicker,
   NameDescriptionInput,
-  SortableFieldList,
 } from "metabase/metadata/components";
 import { useMetadataToasts } from "metabase/metadata/hooks";
 import { getRawTableFieldId } from "metabase/metadata/utils/field";
 import {
-  ActionIcon,
+  Box,
+  Button,
   Group,
   Icon,
   Loader,
@@ -26,41 +26,51 @@ import {
 } from "metabase/ui";
 import type { FieldId, Table, TableFieldOrder } from "metabase-types/api";
 
-import { ResponsiveButton } from "..";
-import type { RouteParams } from "../../types";
-import { getUrl, parseRouteParams } from "../../utils";
+import { DataModelContext } from "../../DataModelContext";
+import { getUrl } from "../../utils";
+import { PublishModelsModal } from "../TablePicker/components/PublishModelsModal";
+import { SubstituteModelModal } from "../TablePicker/components/SubstituteModelModal";
 
-import { FieldList } from "./FieldList";
+import { TableFieldList } from "./TableFieldList";
+import { TableMetadataInfo } from "./TableMetadataInfo";
+import { TableMetadataSettings } from "./TableMetadataSection";
+import { TableModels } from "./TableModels";
 import S from "./TableSection.module.css";
-import { useResponsiveButtons } from "./hooks";
+import { TableSectionGroup } from "./TableSectionGroup";
+import { TableSortableFieldList } from "./TableSortableFieldList";
 
 interface Props {
-  params: RouteParams;
   table: Table;
+  activeFieldId?: FieldId;
   onSyncOptionsClick: () => void;
 }
 
-const TableSectionBase = ({ params, table, onSyncOptionsClick }: Props) => {
-  const { fieldId, ...parsedParams } = parseRouteParams(params);
+const TableSectionBase = ({
+  table,
+  activeFieldId,
+  onSyncOptionsClick,
+}: Props) => {
   const [updateTable] = useUpdateTableMutation();
   const [updateTableSorting, { isLoading: isUpdatingSorting }] =
     useUpdateTableMutation();
   const [updateTableFieldsOrder] = useUpdateTableFieldsOrderMutation();
   const { sendErrorToast, sendSuccessToast, sendUndoToast } =
     useMetadataToasts();
+  const { baseUrl } = useContext(DataModelContext);
   const [isSorting, setIsSorting] = useState(false);
   const hasFields = Boolean(table.fields && table.fields.length > 0);
-  const {
-    buttonsContainerRef,
-    showButtonLabel,
-    setDoneButtonWidth,
-    setSortingButtonWidth,
-    setSyncButtonWidth,
-  } = useResponsiveButtons({
-    hasFields,
-    isSorting,
-    isUpdatingSorting,
-  });
+  const [isCreateModelsModalOpen, setIsCreateModelsModalOpen] = useState(false);
+  const [isSubstituteModelModalOpen, setIsSubstituteModelModalOpen] =
+    useState(false);
+
+  const getFieldHref = (fieldId: FieldId) => {
+    return getUrl(baseUrl, {
+      databaseId: table.db_id,
+      schemaName: table.schema,
+      tableId: table.id,
+      fieldId,
+    });
+  };
 
   const handleNameChange = async (name: string) => {
     const { error } = await updateTable({
@@ -145,15 +155,13 @@ const TableSectionBase = ({ params, table, onSyncOptionsClick }: Props) => {
   };
 
   return (
-    <Stack data-testid="table-section" gap={0} pb="xl">
-      <Stack
-        bg="accent-gray-light"
+    <Stack data-testid="table-section" gap="md" pb="xl">
+      <Box
         className={S.header}
-        gap="lg"
-        pb={12}
+        bg="accent-gray-light"
+        px="lg"
+        mt="xl"
         pos="sticky"
-        pt="xl"
-        px="xl"
         top={0}
       >
         <NameDescriptionInput
@@ -163,110 +171,176 @@ const TableSectionBase = ({ params, table, onSyncOptionsClick }: Props) => {
           nameIcon="table2"
           nameMaxLength={254}
           namePlaceholder={t`Give this table a name`}
-          nameRightSection={
-            <Tooltip label={t`Go to this table`} position="top">
-              <ActionIcon
-                component={Link}
-                to={Urls.queryBuilderTable(table.id, table.db_id)}
-                variant="subtle"
-                color="text-light"
-                size="sm"
-                mr="sm"
-                aria-label={t`Go to this table`}
-              >
-                <Icon name="external" size={16} />
-              </ActionIcon>
-            </Tooltip>
-          }
           onNameChange={handleNameChange}
           onDescriptionChange={handleDescriptionChange}
         />
+      </Box>
 
-        <Group
-          align="center"
-          gap="md"
-          justify="space-between"
-          miw={0}
-          wrap="nowrap"
-        >
-          <Text flex="0 0 auto" fw="bold">{t`Fields`}</Text>
-
-          <Group
+      <Box px="lg">
+        <Group justify="stretch" gap="sm">
+          <Button
             flex="1"
-            gap="md"
-            justify="flex-end"
-            miw={0}
-            ref={buttonsContainerRef}
-            wrap="nowrap"
+            leftSection={<Icon name="settings" />}
+            onClick={onSyncOptionsClick}
+            style={{
+              width: "100%",
+            }}
           >
-            {/* keep these conditions in sync with getRequiredWidth in useResponsiveButtons */}
-
-            {isUpdatingSorting && (
-              <Loader data-testid="loading-indicator" size="xs" />
-            )}
-
-            {!isSorting && hasFields && (
-              <ResponsiveButton
-                icon="sort_arrows"
-                showLabel={showButtonLabel}
-                onClick={() => setIsSorting(true)}
-                onRequestWidth={setSortingButtonWidth}
-              >{t`Sorting`}</ResponsiveButton>
-            )}
-
-            {!isSorting && (
-              <ResponsiveButton
-                icon="gear_settings_filled"
-                showLabel={showButtonLabel}
-                onClick={onSyncOptionsClick}
-                onRequestWidth={setSyncButtonWidth}
-              >{t`Sync options`}</ResponsiveButton>
-            )}
-
-            {isSorting && (
-              <FieldOrderPicker
-                value={table.field_order}
-                onChange={handleFieldOrderTypeChange}
+            {t`Sync settings`}
+          </Button>
+          <Button
+            flex="1"
+            onClick={() => setIsCreateModelsModalOpen(true)}
+            p="sm"
+            leftSection={<Icon name="add_folder" />}
+            style={{
+              width: "100%",
+            }}
+          >{t`Publish`}</Button>
+          <Tooltip label={t`Dependency graph`}>
+            <Box /* wrapping with a Box because Tooltip does not work for <Button component={Link} /> */
+            >
+              <Button
+                component={Link}
+                to={dependencyGraph({
+                  entry: { id: Number(table.id), type: "table" },
+                })}
+                p="sm"
+                leftSection={<Icon name="network" />}
+                style={{
+                  flexGrow: 0,
+                  width: 40,
+                }}
               />
-            )}
-
-            {isSorting && (
-              <ResponsiveButton
-                icon="check"
-                showLabel={showButtonLabel}
-                showIconWithLabel={false}
-                onClick={() => setIsSorting(false)}
-                onRequestWidth={setDoneButtonWidth}
-              >{t`Done`}</ResponsiveButton>
-            )}
-          </Group>
+            </Box>
+          </Tooltip>
+          <Box style={{ flexGrow: 0, width: 40 }}>
+            <TableLink table={table} />
+          </Box>
         </Group>
-      </Stack>
+      </Box>
 
-      <Stack gap="lg" px="xl">
+      <Box px="lg">
+        <TableMetadataSettings table={table} />
+      </Box>
+
+      <Box px="lg">
+        <TableSectionGroup title={t`Metadata`}>
+          <TableMetadataInfo table={table} />
+        </TableSectionGroup>
+      </Box>
+
+      <Box px="lg">
         <Stack gap={12}>
+          <Group
+            align="center"
+            gap="md"
+            justify="space-between"
+            miw={0}
+            wrap="nowrap"
+            h={36}
+          >
+            <Text flex="0 0 auto" fw="bold">{t`Fields`}</Text>
+
+            <Group
+              flex="1"
+              gap="md"
+              justify="flex-end"
+              miw={0}
+              wrap="nowrap"
+              h="100%"
+            >
+              {isUpdatingSorting && (
+                <Loader data-testid="loading-indicator" size="xs" />
+              )}
+
+              {!isSorting && hasFields && (
+                <Button
+                  leftSection={<Icon name="sort_arrows" />}
+                  onClick={() => setIsSorting(true)}
+                >{t`Sorting`}</Button>
+              )}
+
+              {isSorting && (
+                <FieldOrderPicker
+                  value={table.field_order}
+                  onChange={handleFieldOrderTypeChange}
+                />
+              )}
+
+              {isSorting && (
+                <Button
+                  leftSection={<Icon name="check" />}
+                  onClick={() => setIsSorting(false)}
+                  variant="filled"
+                  h="100%"
+                >{t`Done`}</Button>
+              )}
+            </Group>
+          </Group>
+
           {!hasFields && <EmptyState message={t`This table has no fields`} />}
 
-          {isSorting && hasFields && (
-            <SortableFieldList
-              activeFieldKey={fieldId}
-              fields={table.fields ?? []}
-              getFieldKey={getRawTableFieldId}
-              onChange={handleCustomFieldOrderChange}
-            />
-          )}
+          {hasFields && (
+            <>
+              <Box display={isSorting ? "block" : "none"}>
+                <TableSortableFieldList
+                  activeFieldId={activeFieldId}
+                  table={table}
+                  onChange={handleCustomFieldOrderChange}
+                />
+              </Box>
 
-          {!isSorting && hasFields && (
-            <FieldList
-              activeFieldId={fieldId}
-              getFieldHref={(fieldId) => getUrl({ ...parsedParams, fieldId })}
-              table={table}
-            />
+              <Box display={!isSorting ? "block" : "none"}>
+                <TableFieldList
+                  table={table}
+                  activeFieldId={activeFieldId}
+                  getFieldHref={getFieldHref}
+                />
+              </Box>
+            </>
           )}
         </Stack>
-      </Stack>
+      </Box>
+
+      <TableModels table={table} />
+
+      <PublishModelsModal
+        tables={new Set([table.id])}
+        isOpen={isCreateModelsModalOpen}
+        onClose={() => setIsCreateModelsModalOpen(false)}
+      />
+
+      <SubstituteModelModal
+        tableId={table.id}
+        isOpen={isSubstituteModelModalOpen}
+        onClose={() => setIsSubstituteModelModalOpen(false)}
+      />
     </Stack>
   );
 };
+
+function TableLink({ table }: { table: Table }) {
+  return (
+    <Tooltip label={t`Go to this table`} position="top">
+      <Box>
+        {/* wrapping with a Box because Tooltip does not work for <Button component={Link} /> */}
+        <Button
+          component={Link}
+          to={getQueryBuilderUrl(table)}
+          aria-label={t`Go to this table`}
+          leftSection={<Icon name="external" size={16} />}
+          style={{
+            width: "100%",
+          }}
+        />
+      </Box>
+    </Tooltip>
+  );
+}
+
+function getQueryBuilderUrl(table: Table) {
+  return `/question#?db=${table.db_id}&table=${table.id}`;
+}
 
 export const TableSection = memo(TableSectionBase);

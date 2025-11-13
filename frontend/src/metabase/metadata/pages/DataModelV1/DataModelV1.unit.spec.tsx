@@ -52,7 +52,7 @@ import {
   createSampleDatabase,
 } from "metabase-types/api/mocks/presets";
 
-import { DataModel } from "./DataModel";
+import { DataModelV1 } from "./DataModelV1";
 import type { ParsedRouteParams } from "./types";
 import { getUrl } from "./utils";
 
@@ -184,8 +184,6 @@ const OtherComponent = () => {
   );
 };
 
-const BASE_URL = "/admin/datamodel";
-
 async function setup({
   databases = [SAMPLE_DB],
   fieldValues = SAMPLE_DB_FIELD_VALUES,
@@ -215,25 +213,25 @@ async function setup({
       <Route path="notAdmin" component={OtherComponent} />
       <Route path="admin/datamodel">
         <IndexRedirect to="database" />
-        <Route path="database" component={DataModel} />
-        <Route path="database/:databaseId" component={DataModel} />
+        <Route path="database" component={DataModelV1} />
+        <Route path="database/:databaseId" component={DataModelV1} />
         <Route
           path="database/:databaseId/schema/:schemaId"
-          component={DataModel}
+          component={DataModelV1}
         />
         <Route
           path="database/:databaseId/schema/:schemaId/table/:tableId"
-          component={DataModel}
+          component={DataModelV1}
         />
         <Route
           path="database/:databaseId/schema/:schemaId/table/:tableId/field/:fieldId"
-          component={DataModel}
+          component={DataModelV1}
         />
       </Route>
     </>,
     {
       withRouter: true,
-      initialRoute: initialRoute ?? getUrl(BASE_URL, params),
+      initialRoute: initialRoute ?? getUrl(params),
     },
   );
 
@@ -253,7 +251,7 @@ async function setup({
   return { history };
 }
 
-describe("DataModel", () => {
+describe("DataModelV1", () => {
   beforeEach(() => {
     // so the virtual list renders correctly in the tests
     mockGetBoundingClientRect();

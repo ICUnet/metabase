@@ -150,11 +150,7 @@ function setup({
   const onChange = jest.fn();
 
   renderWithProviders(
-    <UncontrolledTablePicker
-      initialValue={path}
-      onChange={onChange}
-      params={{}}
-    />,
+    <UncontrolledTablePicker initialValue={path} onChange={onChange} />,
   );
   return { onChange };
 }

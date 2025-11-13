@@ -1,11 +1,9 @@
 import { getUrl as getUrl_ } from "../../utils";
 
-import { type NodeSelection, isItemSelected } from "./bulk-selection.utils";
 import { CHILD_TYPES, UNNAMED_SCHEMA_NAME } from "./constants";
 import type {
   DatabaseNode,
   ExpandedState,
-  FilterState,
   FlatItem,
   ItemType,
   NodeKey,
@@ -18,8 +16,9 @@ export function hasChildren(type: ItemType): boolean {
   return type !== "table";
 }
 
-export function getUrl(baseUrl: string, value: TreePath) {
-  return getUrl_(baseUrl, {
+export function getUrl(value: TreePath) {
+  return getUrl_({
+    fieldId: undefined,
     tableId: undefined,
     databaseId: undefined,
     schemaName: undefined,
@@ -28,8 +27,6 @@ export function getUrl(baseUrl: string, value: TreePath) {
 }
 
 // Returns a new state object with all the nodes along the path expanded.
-// Note: This only expands parent containers (database, schema) but NOT tables,
-// to prevent unwanted expansion when navigating via checkbox selection.
 export function expandPath(
   state: ExpandedState,
   path: TreePath,
@@ -70,7 +67,6 @@ export function flatten(
     level?: number;
     parent?: NodeKey;
     canFlattenSingleSchema?: boolean;
-    selection?: NodeSelection;
   } = {},
 ): FlatItem[] {
   const {
@@ -80,7 +76,6 @@ export function flatten(
     canFlattenSingleSchema,
     level = 0,
     parent,
-    selection,
   } = opts;
   if (node.type === "root") {
     // root node doesn't render a title and is always expanded
@@ -93,8 +88,6 @@ export function flatten(
     }
     return sort(node.children).flatMap((child) => flatten(child, opts));
   }
-
-  const isSelected = selection ? isItemSelected(node, selection) : "no";
 
   if (
     node.type === "schema" &&
@@ -114,22 +107,22 @@ export function flatten(
   }
 
   if (typeof isExpanded === "function" && !isExpanded(node.key)) {
-    return [{ ...node, level, parent, isSelected }];
+    return [{ ...node, level, parent }];
   }
 
   if (addLoadingNodes && node.children.length === 0) {
     const childType = CHILD_TYPES[node.type];
     if (!childType) {
-      return [{ ...node, level, parent, isSelected }];
+      return [{ ...node, level, parent }];
     }
     return [
-      { ...node, isExpanded: true, level, parent, isSelected },
+      { ...node, isExpanded: true, level, parent },
       loadingItem(childType, level + 1, node),
     ];
   }
 
   return [
-    { ...node, isExpanded: true, level, parent, isSelected },
+    { ...node, isExpanded: true, level, parent },
     ...sort(node.children).flatMap((child) =>
       flatten(child, {
         ...opts,
@@ -222,28 +215,5 @@ export function loadingItem(
     parent: parent?.type === "root" ? undefined : parent?.key,
     isLoading: true,
     key: Math.random().toString(),
-    children: [],
   };
-}
-
-export function getFiltersCount(filters: FilterState): number {
-  let count = 0;
-
-  if (filters.dataSource != null) {
-    ++count;
-  }
-
-  if (filters.dataLayer != null) {
-    ++count;
-  }
-
-  if (filters.ownerEmail != null || filters.ownerUserId != null) {
-    ++count;
-  }
-
-  if (filters.orphansOnly === true) {
-    ++count;
-  }
-
-  return count;
 }

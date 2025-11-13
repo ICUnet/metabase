@@ -9,7 +9,7 @@ import type { TreePath } from "../types";
 import { flatten } from "../utils";
 
 import { EmptyState } from "./EmptyState";
-import { TablePickerResults } from "./Results";
+import { Results } from "./Results";
 
 interface Props {
   query: string;
@@ -70,7 +70,7 @@ export function Search({ query, path, onChange }: Props) {
   }
 
   return (
-    <TablePickerResults
+    <Results
       items={items}
       path={path}
       onItemClick={onChange}
