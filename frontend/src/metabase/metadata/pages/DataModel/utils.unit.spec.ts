@@ -49,8 +49,6 @@ describe("parseRouteParams", () => {
   });
 });
 
-const BASE_URL = "/admin/datamodel";
-
 describe("getUrl", () => {
   it("should generate URL with all params", () => {
     const params: ParsedRouteParams = {
@@ -60,8 +58,8 @@ describe("getUrl", () => {
       fieldId: 3,
     };
 
-    expect(getUrl(BASE_URL, params)).toBe(
-      `${BASE_URL}/database/1/schema/1:public/table/2/field/3`,
+    expect(getUrl(params)).toBe(
+      "/admin/datamodel/database/1/schema/1:public/table/2/field/3",
     );
   });
 
@@ -73,8 +71,8 @@ describe("getUrl", () => {
       fieldId: undefined,
     };
 
-    expect(getUrl(BASE_URL, params)).toBe(
-      `${BASE_URL}/database/1/schema/1:public/table/2`,
+    expect(getUrl(params)).toBe(
+      "/admin/datamodel/database/1/schema/1:public/table/2",
     );
   });
 
@@ -86,9 +84,7 @@ describe("getUrl", () => {
       fieldId: undefined,
     };
 
-    expect(getUrl(BASE_URL, params)).toBe(
-      `${BASE_URL}/database/1/schema/1:public`,
-    );
+    expect(getUrl(params)).toBe("/admin/datamodel/database/1/schema/1:public");
   });
 
   it("should generate URL with database", () => {
@@ -99,7 +95,7 @@ describe("getUrl", () => {
       fieldId: undefined,
     };
 
-    expect(getUrl(BASE_URL, params)).toBe(`${BASE_URL}/database/1`);
+    expect(getUrl(params)).toBe("/admin/datamodel/database/1");
   });
 
   it("should generate base URL when no params are provided", () => {
@@ -110,7 +106,7 @@ describe("getUrl", () => {
       fieldId: undefined,
     };
 
-    expect(getUrl(BASE_URL, params)).toBe(BASE_URL);
+    expect(getUrl(params)).toBe("/admin/datamodel");
   });
 
   it("should not include field param when there is no table param", () => {
@@ -121,9 +117,7 @@ describe("getUrl", () => {
       fieldId: 3,
     };
 
-    expect(getUrl(BASE_URL, params)).toBe(
-      `${BASE_URL}/database/1/schema/1:public`,
-    );
+    expect(getUrl(params)).toBe("/admin/datamodel/database/1/schema/1:public");
   });
 
   it("should not include schema, table, and field params when there is no database param", () => {
@@ -134,6 +128,6 @@ describe("getUrl", () => {
       fieldId: 3,
     };
 
-    expect(getUrl(BASE_URL, params)).toBe(BASE_URL);
+    expect(getUrl(params)).toBe("/admin/datamodel");
   });
 });

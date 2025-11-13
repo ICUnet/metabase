@@ -1,26 +1,18 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { push, replace } from "react-router-redux";
 
 import { useDispatch, useSelector } from "metabase/lib/redux";
 import { getLocation } from "metabase/selectors/routing";
 
-import { DataModelContext } from "../../DataModelContext";
-import type { RouteParams } from "../../types";
-
 import { TablePicker } from "./components";
 import type { ChangeOptions, TreePath } from "./types";
 import { getUrl } from "./utils";
 
-type Props = TreePath & {
-  params: RouteParams;
-};
-
-export function RouterTablePicker({ params, ...props }: Props) {
+export function RouterTablePicker(props: TreePath) {
   const dispatch = useDispatch();
   const [value, setValue] = useState(props);
   const location = useSelector(getLocation);
-  const { baseUrl } = useContext(DataModelContext);
-  const isSegments = location.pathname?.startsWith(`${baseUrl}/segment`);
+  const isSegments = location.pathname?.startsWith("/admin/datamodel/segment");
 
   const onChange = useCallback(
     (value: TreePath, options?: ChangeOptions) => {
@@ -34,37 +26,29 @@ export function RouterTablePicker({ params, ...props }: Props) {
         if (options?.isAutomatic) {
           // prevent auto-navigation from table-picker when Segments tab is open
           if (!isSegments) {
-            dispatch(replace(getUrl(baseUrl, value)));
+            dispatch(replace(getUrl(value)));
           }
         } else {
-          dispatch(push(getUrl(baseUrl, value)));
+          dispatch(push(getUrl(value)));
         }
       }
     },
-    [dispatch, baseUrl, isSegments, props],
+    [dispatch, isSegments, props],
   );
 
   useEffect(() => {
-    if (
-      value.databaseId !== props.databaseId ||
-      value.schemaName !== props.schemaName ||
-      value.tableId !== props.tableId
-    ) {
-      setValue(props);
-    }
-  }, [props, value]);
+    setValue(props);
+  }, [props]);
 
-  return <TablePicker path={value} onChange={onChange} params={params} />;
+  return <TablePicker path={value} onChange={onChange} />;
 }
 
 export function UncontrolledTablePicker({
   initialValue,
   onChange,
-  params,
 }: {
   initialValue: TreePath;
   onChange?: (path: TreePath) => void;
-  params: RouteParams;
 }) {
   const [value, setValue] = useState(initialValue);
   const handleChange = useCallback(
@@ -74,5 +58,5 @@ export function UncontrolledTablePicker({
     },
     [onChange],
   );
-  return <TablePicker path={value} onChange={handleChange} params={params} />;
+  return <TablePicker path={value} onChange={handleChange} />;
 }

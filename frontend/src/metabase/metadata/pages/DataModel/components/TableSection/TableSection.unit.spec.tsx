@@ -13,20 +13,37 @@ type SetupOpts = {
   params?: RouteParams;
 };
 
-function setup({ table = createMockTable() }: SetupOpts = {}) {
+function setup({
+  table = createMockTable(),
+  params = createMockRouteParams(),
+}: SetupOpts = {}) {
   const onSyncOptionsClick = jest.fn();
 
   renderWithProviders(
     <Route
       path="/"
       component={() => (
-        <TableSection table={table} onSyncOptionsClick={onSyncOptionsClick} />
+        <TableSection
+          table={table}
+          params={params}
+          onSyncOptionsClick={onSyncOptionsClick}
+        />
       )}
     />,
     { withRouter: true },
   );
 
   return { onSyncOptionsClick };
+}
+
+function createMockRouteParams(opts?: Partial<RouteParams>): RouteParams {
+  return {
+    databaseId: "1",
+    schemaId: "1:public",
+    tableId: "1",
+    fieldId: "1",
+    ...opts,
+  };
 }
 
 describe("TableSection", () => {
