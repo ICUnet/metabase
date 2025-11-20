@@ -691,6 +691,43 @@
     (catch Throwable e
       (log/warnf e "Error with autocomplete: %s" (ex-message e)))))
 
+(api.macros/defendpoint :put "/update-database-tables-fields/:id"
+  "Update database name, table display names, and field display names."
+  [{:keys [id]} :- [:map
+                    [:id ms/PositiveInt]]
+   _query-params
+   {:keys [new_database_name table_names field_names], :as _body} :- [:map
+                    [:new_database_name ms/NonBlankString]
+                    [:table_names [:map-of ms/PositiveInt ms/NonBlankString]]
+                    [:field_names [:map-of ms/PositiveInt ms/NonBlankString]]]]
+  (api/check-superuser)
+  (api/let-404 [existing-db (t2/select-one :model/Database :id id)]
+    (api/check-403 (mi/can-write? existing-db))
+
+    (t2/with-transaction [_conn]
+      (t2/update! :model/Database id {:name new_database_name})
+
+      (let [updated-db (t2/select-one :model/Database :id id)]
+        (events/publish-event! :event/database-update
+                               {:object          updated-db
+                                :user-id         api/*current-user-id*
+                                :previous-object existing-db
+                                :details-changed? false}))
+
+      ;; Update tables
+      (doseq [[table-id new-name] table_names]
+        (t2/update! :model/Table table-id {:display_name new-name}))
+
+      ;; Update fields
+      (doseq [[field-id new-name] field_names]
+        (let [field (t2/select-one :model/Field :id field-id)]
+          (when field
+            (when (:field_id field)
+              (t2/update! :model/Dimension :field_id field-id {:name new-name}))
+            (t2/update! :model/Field field-id {:display_name new-name})))))
+
+     {:status 200, :body ""}))
+
 (api.macros/defendpoint :get "/:id/card_autocomplete_suggestions"
   "Return a list of `Card` autocomplete suggestions for a given `query` in a given `Database`.
 
