@@ -34,10 +34,26 @@ export const sessionApi = Api.injectEndpoints({
       providesTags: ["session-properties"],
       onQueryStarted: async (_, { queryFulfilled, dispatch }) => {
         const response = await queryFulfilled;
-        if (response.data) {
-          dispatch(loadSettings(response.data));
+
+        let updatedData: EnterpriseSettings | null = null;
+
+        const desiredMainColor = (window as any).parent?.DESIRED_MAIN_COLOR;
+        if (!!desiredMainColor && response.data) {
+          updatedData = {
+            ...response.data,
+            "application-colors": {
+              ...response.data["application-colors"],
+              brand: desiredMainColor,
+            },
+          };
+        } else {
+          updatedData = response.data;
+        }
+
+        if (updatedData) {
+          dispatch(loadSettings(updatedData));
           // compatibility layer for legacy settings on the window object
-          MetabaseSettings.setAll(response.data);
+          MetabaseSettings.setAll(updatedData);
         }
       },
     }),

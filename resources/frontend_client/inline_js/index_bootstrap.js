@@ -3,6 +3,10 @@
   window.MetabaseUserLocalization = JSON.parse(document.getElementById("_metabaseUserLocalization").textContent);
   window.MetabaseSiteLocalization = JSON.parse(document.getElementById("_metabaseSiteLocalization").textContent);
   window.MetabaseNonce            = JSON.parse(document.getElementById("_metabaseNonce").textContent);
+  var desiredColor = window.parent?.DESIRED_MAIN_COLOR;
+  if (!!desiredColor) {
+    window.MetabaseBootstrap["application-colors"].brand = desiredColor;
+  }
 
   var configuredRoot = document.head.querySelector("meta[name='base-href']").content;
   var actualRoot = "/";
