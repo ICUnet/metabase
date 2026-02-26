@@ -246,7 +246,7 @@
     "cross-fetch": "^3.1.5",
     "crypto-browserify": "^3.12.0",
     "css-loader": "^6.10.0",
-    "cypress": "^14.2.0",
+    "cypress": "^14.5.3",
     "cypress-multi-reporters": "^1.6.4",
     "cypress-real-events": "^1.14.0",
     "cypress-split": "^1.24.14",
@@ -354,25 +354,26 @@
     "yarn-deduplicate": "^6.0.2"
   },
   "resolutions": {
+    "@types/react-dom": "^18.2.17",
+    "@types/react": "^18.2.42",
     "ansi-html": "https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz",
     "ansi-regex": "5.0.1",
     "cookie": "^0.7.0",
     "cross-spawn": "^7.0.5",
     "d3-color": "^3.1.0",
-    "elliptic": "^6.6.1",
     "debug": "^4.3.4",
+    "elliptic": "^6.6.1",
+    "fetch-mock/path-to-regexp": "3.3.0",
     "follow-redirects": "^1.15.5",
     "jsdom": "^22.1.0",
     "json5": "2.2.2",
+    "nanoid": "^3.3.8",
     "nth-check": "2.0.1",
-    "@types/react": "^18.2.42",
-    "@types/react-dom": "^18.2.17",
+    "on-headers": "^1.1.0",
     "set-value": "4.0.1",
     "unset-value": "2.0.1",
     "webpack-dev-middleware": "^5.3.4",
-    "webpack-dev-server": "^5.2.1",
-    "nanoid": "^3.3.8",
-    "fetch-mock/path-to-regexp": "3.3.0"
+    "webpack-dev-server": "^5.2.1"
   },
   "scripts": {
     "build": "yarn build:cljs && yarn build:js",
@@ -424,10 +425,10 @@
     "dev-ee-hot-be": "yarn && yarn clean-dev:cljs && concurrently -n 'backend,frontend,cljs,static-viz' -c 'blue,green,yellow,magenta,red' 'clojure -M:run:ee:dev:dev-start --hot' 'MB_EDITION=ee ENABLE_CLJS_HOT_RELOAD=true yarn build-hot:js-wait' 'MB_EDITION=ee yarn build-hot:cljs' 'yarn build-static-viz:watch-wait'",
     "embedding-sdk:fixup-types-imports": "node ./bin/embedding-sdk/fixup-types-after-compilation.js",
     "embedding-sdk:generate-package": "node ./bin/embedding-sdk/generate-sdk-package-files.js",
-    "embedding-sdk:generate-changelog": "yarn conventional-changelog --config enterprise/frontend/src/embedding-sdk/conventional-changelog-config.js",
+    "embedding-sdk:generate-changelog": "yarn conventional-changelog --config enterprise/frontend/src/embedding-sdk-bundle/conventional-changelog-config.js",
     "embedding-sdk:publish": "cd ./resources/embedding-sdk && npm publish",
-    "embedding-sdk:generate-nextjs-compat": "tsx enterprise/frontend/src/embedding-sdk/bin/generate-nextjs-compat.ts",
-    "embedding-sdk:test-unit": "yarn test-unit enterprise/frontend/src/embedding-sdk/",
+    "embedding-sdk:generate-nextjs-compat": "tsx enterprise/frontend/src/embedding-sdk-bundle/bin/generate-nextjs-compat.ts",
+    "embedding-sdk:test-unit": "yarn test-unit enterprise/frontend/src/embedding-sdk-bundle/",
     "embedding-sdk:tsc": "tsc --project tsconfig.sdk.json",
     "embedding-sdk:docs:generate:pure": "typedoc --options ./.typedoc/typedoc.html.config.js && typedoc --options ./.typedoc/typedoc.markdown.config.js",
     "embedding-sdk:docs:generate": "yarn run build-embedding-sdk && yarn run embedding-sdk:docs:generate:pure",
@@ -501,7 +502,7 @@
     "e2e/test/scenarios/*/{*.(js|ts),!(helpers|shared)/*.(js|ts)}": [
       "node e2e/validate-e2e-test-files.js"
     ],
-    "enterprise/frontend/src/embedding-sdk/README.md": [
+    "enterprise/frontend/src/embedding-sdk-bundle/README.md": [
       "prettier --write"
     ],
     "+(.storybook|.storybook-sdk)/**/*.{js,jsx,ts,tsx,css}": [

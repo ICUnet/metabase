@@ -177,11 +177,12 @@ const tokenStatusFeatures = [
   "email-restrict-recipients",
   "embedding-sdk",
   "embedding",
-  "embedding-iframe-sdk",
+  "embedding-simple",
   "hosting",
   "metabase-store-managed",
   "metabot-v3",
   "no-upsell",
+  "offer-metabase-ai",
   "official-collections",
   "query-reference-validation",
   "question-error-logs",
@@ -202,6 +203,10 @@ const tokenStatusFeatures = [
 
 export type TokenStatusFeature = (typeof tokenStatusFeatures)[number];
 
+interface TokenStatusStoreUsers {
+  email: string;
+}
+
 export interface TokenStatus {
   status: TokenStatusStatus;
   valid: boolean;
@@ -209,6 +214,7 @@ export interface TokenStatus {
   "error-details"?: string;
   trial?: boolean;
   features?: TokenStatusFeature[];
+  "store-users"?: TokenStatusStoreUsers[];
 }
 
 export type DayOfWeekId =
@@ -229,7 +235,7 @@ export const tokenFeatures = [
   "content_verification",
   "embedding",
   "embedding_sdk",
-  "embedding_iframe_sdk",
+  "embedding_simple",
   "hosting",
   "official_collections",
   "sandboxes",
@@ -250,6 +256,7 @@ export const tokenFeatures = [
   "query_reference_validation",
   "cache_preemptive",
   "metabot_v3",
+  "offer_metabase_ai",
   "ai_sql_fixer",
   "ai_sql_generation",
   "ai_entity_analysis",

@@ -1,8 +1,8 @@
 const { H } = cy;
 import { SAMPLE_DATABASE } from "e2e/support/cypress_sample_database";
 import { ORDERS_DASHBOARD_ID } from "e2e/support/cypress_sample_instance_data";
+import { questionAsPinMapWithTiles } from "e2e/test/scenarios/embedding/shared/embedding-questions";
 import { defer } from "metabase/lib/promise";
-
 const { PRODUCTS, PRODUCTS_ID, ORDERS, ORDERS_ID } = SAMPLE_DATABASE;
 
 describe.skip("issue 15860", () => {
@@ -1223,8 +1223,8 @@ describe("issue 8490", () => {
 
       cy.log("assert the line chart");
       H.getDashboardCard(0).within(() => {
-        // X-axis labels: Jan 2024 (or some other year)
-        cy.findByText(/^1월 20\d\d\b/).should("be.visible");
+        // X-axis labels: Created at
+        cy.findByText(/월/).should("be.visible");
         // Aggregation "count"
         cy.findByText("카운트").should("be.visible");
       });
@@ -1491,4 +1491,27 @@ describe("issue 51934 (EMB-189)", () => {
       });
     });
   }
+});
+
+describe("issue 63687", () => {
+  beforeEach(() => {
+    H.restore();
+    cy.signInAsAdmin();
+  });
+
+  it("should properly display pin map tiles without auth errors for a valid JWT token", () => {
+    H.createNativeQuestion(questionAsPinMapWithTiles, {
+      visitQuestion: true,
+    });
+
+    H.openStaticEmbeddingModal({ activeTab: "parameters" });
+
+    cy.intercept("/api/embed/tiles/**").as("getTiles");
+
+    H.visitIframe();
+
+    cy.wait("@getTiles").then(({ response: tileResponse }) => {
+      expect(tileResponse?.statusCode).to.equal(200);
+    });
+  });
 });

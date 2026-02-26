@@ -712,7 +712,10 @@
     :test/uuids-in-create-table-statements
 
     ;; Does this driver support Metabase's database routing feature?
-    :database-routing})
+    :database-routing
+
+    ;; Does this driver support creating a java.sql.Statement via a Connection?
+    :jdbc/statements})
 
 (defmulti database-supports?
   "Does this driver and specific instance of a database support a certain `feature`?
@@ -1341,3 +1344,14 @@
   :hierarchy #'hierarchy)
 
 (defmethod table-known-to-not-exist? ::driver [_ _] false)
+
+(defmulti do-with-resilient-connection
+  "Execute function `f` within a context that may recover (on-demand) from connection failures.
+  `f` must be eager."
+  {:added "0.55.9" :arglists '([driver database f])}
+  dispatch-on-initialized-driver
+  :hierarchy #'hierarchy)
+
+(defmethod do-with-resilient-connection
+  ::driver
+  [driver database f] (f driver database))

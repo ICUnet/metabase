@@ -23,7 +23,7 @@
    [metabase.query-processor.util.add-alias-info :as add]
    [metabase.util.honey-sql-2 :as h2x])
   (:import
-   (java.sql Connection ResultSet)))
+   (java.sql Connection ResultSet Types)))
 
 (set! *warn-on-reflection* true)
 
@@ -230,9 +230,6 @@
         (.close stmt)
         (throw e)))))
 
-;; the current HiveConnection doesn't support .createStatement
-(defmethod sql-jdbc.execute/statement-supported? :sparksql [_] false)
-
 (doseq [[feature supported?] {:basic-aggregations              true
                               :binning                         true
                               :expression-aggregations         true
@@ -246,7 +243,8 @@
                               :test/jvm-timezone-setting       false
                               ;; disabled for now, see issue #40991 to fix this.
                               :window-functions/cumulative     false
-                              :database-routing                false}]
+                              :database-routing                false
+                              :jdbc/statements                 false}]
   (defmethod driver/database-supports? [:sparksql feature] [_driver _feature _db] supported?))
 
 (defmethod sql.qp/quote-style :sparksql
@@ -264,3 +262,8 @@
 (defmethod sql-jdbc/impl-table-known-to-not-exist? :sparksql
   [_ e]
   (= (sql-jdbc/get-sql-state e) "42P01"))
+
+(defmethod sql-jdbc.execute/read-column-thunk [:sparksql Types/ARRAY]
+  [_ ^ResultSet rs _rsmeta ^Integer i]
+  (fn []
+    (.getObject rs i)))

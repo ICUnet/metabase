@@ -246,13 +246,18 @@
   "Should Metabase generate SQL queries?"
   :ai-sql-generation)
 
-(define-premium-feature ^{:added "0.55.0"} enable-embedding-iframe-sdk?
-  "Should we allow users to embed the SDK in iframes?"
-  :embedding-iframe-sdk)
+; the "-feature" suffix avoids name collision with the setting getter
+(define-premium-feature ^{:added "0.55.0"} enable-embedding-simple-feature?
+  "Should we enable simple embedding features?"
+  :embedding-simple)
 
 (define-premium-feature ^{:added "0.55.0"} enable-ai-entity-analysis?
   "Should Metabase do AI analysis on entities?"
   :ai-entity-analysis)
+
+(define-premium-feature ^{:added "0.55.0"} offer-metabase-ai?
+  "Offer Metabase AI add-on"
+  :offer-metabase-ai)
 
 (defn- -token-features []
   {:advanced_permissions           (enable-advanced-permissions?)
@@ -275,10 +280,11 @@
    :email_restrict_recipients      (enable-email-restrict-recipients?)
    :embedding                      (hide-embed-branding?)
    :embedding_sdk                  (enable-embedding-sdk-origins?)
-   :embedding_iframe_sdk           (enable-embedding-iframe-sdk?)
+   :embedding_simple               (enable-embedding-simple-feature?)
    :hosting                        (is-hosted?)
    :llm_autodescription            (enable-llm-autodescription?)
    :metabot_v3                     (enable-metabot-v3?)
+   :offer_metabase_ai              (offer-metabase-ai?)
    :official_collections           (enable-official-collections?)
    :query_reference_validation     (enable-query-reference-validation?)
    :sandboxes                      (enable-sandboxes?)

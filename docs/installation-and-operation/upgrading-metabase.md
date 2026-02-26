@@ -8,7 +8,7 @@ redirect_from:
 
 This page covers how to upgrade to a new Metabase release.
 
-- [Announcement posts for major releases](https://www.)
+- [Announcement posts for major releases](https://www.metabase.com/releases)
 - [Changelogs](https://www.metabase.com/changelog).
 - [Release notes on GitHub](https://github.com/metabase/metabase/releases).
 
@@ -139,6 +139,8 @@ If you need to downgrade after a major version upgrade, you'll either need to re
 Durning a **minor version upgrade** (e.g., 54.1 to 54.2), the new Metabase container or Jar will just work. Only in rare cases will it have to perform a migration, but, like with major version upgrades, Metabase will perform the migration automatically. And of course, you're backing up your application database each time you upgrade, right?
 
 ## Rolling back an upgrade or to an older version
+
+> **The downgrade command must be run on the JAR with the higher version number.**
 
 In general, regular backups (especially backups before upgrading), are the best policy, so we recommend reverting to a backup of your application database to roll back an upgrade.
 

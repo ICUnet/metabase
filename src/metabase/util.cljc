@@ -10,6 +10,7 @@
              [clojure.pprint :as pprint]
              ^{:clj-kondo/ignore [:discouraged-namespace]}
              [metabase.util.jvm :as u.jvm]
+             [metabase.util.http :as u.http]
              [metabase.util.string :as u.str]
              [potemkin :as p]
              [ring.util.codec :as codec])
@@ -77,7 +78,9 @@
                         with-timeout
                         with-us-locale]
                        [u.str
-                        build-sentence]))
+                        build-sentence]
+                       [u.http
+                        valid-host?]))
 
 (defmacro or-with
   "Like or, but determines truthiness with `pred`."
@@ -928,8 +931,11 @@
     (let [item        (first to-traverse)
           found       (traverse-fn (key item))
           traversed   (conj traversed item)
-          to-traverse (into (dissoc to-traverse (key item))
-                            (apply dissoc found (keys traversed)))]
+          ;; `merge-with into` allows us to not lose dependency info if an entity was required from a few different
+          ;; locations
+          to-traverse (merge-with into
+                                  (dissoc to-traverse (key item))
+                                  (apply dissoc found (keys traversed)))]
       (if (empty? to-traverse)
         traversed
         (recur to-traverse traversed)))))

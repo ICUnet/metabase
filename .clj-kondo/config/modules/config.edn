@@ -292,6 +292,7 @@
            models
            premium-features
            settings
+           store-api
            task
            util}}
 
@@ -472,6 +473,7 @@
    :api  #{metabase.embedding.api
            metabase.embedding.init
            metabase.embedding.settings
+           metabase.embedding.util
            metabase.embedding.validation}
    :uses #{analytics
            api
@@ -486,6 +488,7 @@
            public-sharing
            queries
            query-processor
+           request
            settings
            tiles
            util}}
@@ -980,6 +983,7 @@
            metabase.request.init}
    :uses #{api
            config
+           embedding
            permissions                  ; FIXME
            session
            settings
@@ -996,6 +1000,7 @@
            dashboards
            events
            models
+           queries
            query-permissions
            util}}
 
@@ -1156,6 +1161,14 @@
    :api  #{metabase.startup.core}
    :uses #{util}}
 
+  store-api
+  {:team "Cloud"
+   :api  #{metabase.store-api.core
+           metabase.store-api.init}
+   :uses #{config
+           settings
+           util}}
+
   sync
   {:team "Semantic Layer"
    :api #{metabase.sync.api
@@ -1281,9 +1294,11 @@
   users
   {:team "Admin Webapp"
    :api  #{metabase.users.api
+           metabase.users.core
            metabase.users.init
            metabase.users.models.user
-           metabase.users.models.user-parameter-value}
+           metabase.users.models.user-parameter-value
+           metabase.users.schema}
    :uses #{analytics
            api
            appearance
@@ -1506,6 +1521,7 @@
            app-db
            audit-app
            classloader
+           config
            driver
            lib
            models
@@ -1530,7 +1546,9 @@
   {:team "Admin Webapp"
    :api  #{metabase-enterprise.billing.api.routes}
    :uses #{api
-           premium-features util}}
+           premium-features
+           store-api
+           util}}
 
   enterprise/cache
   {:team "Admin Webapp"
@@ -1540,6 +1558,15 @@
            query-processor
            task
            util}}
+
+  enterprise/cloud-add-ons
+  {:team "Cloud"
+   :api  #{metabase-enterprise.cloud-add-ons.api}
+   :uses #{api
+           events
+           premium-features
+           util
+           enterprise/harbormaster}}
 
   enterprise/content-verification
   {:team "Admin Webapp"
@@ -1598,7 +1625,7 @@
   {:team "Cloud"
    :api  #{metabase-enterprise.harbormaster.client}
    :uses #{api
-           cloud-migration
+           store-api
            util}}
 
   enterprise/impersonation
